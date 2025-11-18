@@ -4,6 +4,6 @@
     channel = "stable"
 
 [build]
-  command = "flutter build web --release"
+  command = "flutter build web --release --wasm"
   publish = "build/web"
   
