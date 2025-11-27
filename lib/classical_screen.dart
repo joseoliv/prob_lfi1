@@ -733,10 +733,10 @@ class _ClassicalScreenState extends State<ClassicalScreen> {
                           case 'Reset':
                             _reset();
                             break;
-                          case 'Reset PI':
+                          case 'Prob. Independency':
                             _resetPI();
                             break;
-                          case 'Reset BCT':
+                          case 'Bayes Confirm.':
                             _resetBCT();
                             break;
                           case 'Reset Raven':
@@ -758,22 +758,22 @@ class _ClassicalScreenState extends State<ClassicalScreen> {
                         ),
                       ),
                       DropdownMenuItem(
-                        value: 'Reset PI',
+                        value: 'Prob. Independency',
                         child: Row(
                           children: const [
                             Icon(Icons.calculate, size: 20),
                             SizedBox(width: 8),
-                            SelText('Reset PI'),
+                            SelText('Prob. Independency'),
                           ],
                         ),
                       ),
                       DropdownMenuItem(
-                        value: 'Reset BCT',
+                        value: 'Bayes Confirm.',
                         child: Row(
                           children: const [
                             Icon(Icons.settings_backup_restore, size: 20),
                             SizedBox(width: 8),
-                            SelText('Reset BCT'),
+                            SelText('Bayes Confirm.'),
                           ],
                         ),
                       ),
@@ -802,7 +802,6 @@ class _ClassicalScreenState extends State<ClassicalScreen> {
           ),
           const SizedBox(height: 15),
           Expanded(child: Builder(builder: (context) {
-            print('prSum: ${_prSum.$1}/${_prSum.$2}');
             return table(
               prA: _prA,
               prB: _prB,
@@ -907,14 +906,14 @@ class _ClassicalScreenState extends State<ClassicalScreen> {
         */
 
         initialMap: {
-          0: (1128, 2560),      // 0   0   0    1128/2560
-          1: (51, 2560),        // 0   0   1      51/2560
-          4: (1125, 2560),      // 1   0   0    1125/2560
-          5: (0, 2560),         // 1   0   1      0/2560
-          2: (21, 2560),        // 0   1   0      21/2560
-          3: (80, 2560),        // 0   1   1      80/2560
-          6: (30, 2560),        // 1   1   0      30/2560
-          7: (125, 2560),       // 1   1   1     125/2560
+          0: (1128, 2560), // 0   0   0    1128/2560
+          1: (51, 2560), // 0   0   1      51/2560
+          4: (1125, 2560), // 1   0   0    1125/2560
+          5: (0, 2560), // 1   0   1      0/2560
+          2: (21, 2560), // 0   1   0      21/2560
+          3: (80, 2560), // 0   1   1      80/2560
+          6: (30, 2560), // 1   1   0      30/2560
+          7: (125, 2560), // 1   1   1     125/2560
         });
 
     _calculateAndDisplayProbabilities();

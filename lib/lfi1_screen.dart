@@ -23,7 +23,7 @@ class _LFI1ScreenState extends State<LFI1Screen> {
   late List<TextEditingController> _textControllers;
   late List<(int, int)> _probValues;
   late List<String> _probLabels;
-  String? _selectedResetOption;
+  String _selectedResetOption = 'Choose';
   // (c) Calculated results
   (int, int) _prA = (0, 1);
   (int, int) _prB = (0, 1);
@@ -493,18 +493,19 @@ class _LFI1ScreenState extends State<LFI1Screen> {
                     isDense: true,
                     icon: const Icon(Icons.arrow_drop_down,
                         size: 25), // Reset icon
-                    hint: const SelText('Reset options'),
+                    hint: SelText(_selectedResetOption),
                     onChanged: (String? newValue) {
+                      if (newValue == null) return;
                       setState(() {
                         _selectedResetOption = newValue;
                         switch (newValue) {
                           case 'Reset':
                             _reset();
                             break;
-                          case 'PI':
+                          case 'Prob. Independency':
                             _resetPI();
                             break;
-                          case 'BCT':
+                          case 'Bayes Confirm.':
                             _resetBCT();
                             break;
                           case 'Raven':
@@ -514,12 +515,11 @@ class _LFI1ScreenState extends State<LFI1Screen> {
                             _resetMiracle();
                             break;
                         }
-                        _selectedResetOption = null;
                       });
                     },
                     items: [
                       DropdownMenuItem(
-                        value: 'Reset',
+                        value: 'Choose',
                         child: Row(
                           children: const [
                             Icon(Icons.restart_alt, size: 20),
@@ -529,22 +529,33 @@ class _LFI1ScreenState extends State<LFI1Screen> {
                         ),
                       ),
                       DropdownMenuItem(
-                        value: 'PI',
+                        value: 'Prob. Independency',
                         child: Row(
-                          children: const [
-                            Icon(Icons.calculate, size: 20),
+                          children: [
+                            Transform.rotate(
+                              angle: 0.785398, // 45 degrees in radians (π/4)
+                              child: const Text(
+                                '=',
+                                style: TextStyle(
+                                    fontSize: 25, fontWeight: FontWeight.bold),
+                              ),
+                            ),
                             SizedBox(width: 8),
-                            SelText('PI'),
+                            SelText('Prob. Independency'),
                           ],
                         ),
                       ),
                       DropdownMenuItem(
-                        value: 'BCT',
+                        value: 'Bayes Confirm.',
                         child: Row(
-                          children: const [
-                            Icon(Icons.settings_backup_restore, size: 20),
+                          children: [
+                            Image.asset(
+                              'assets/icons/visual-bayes-theorem.png',
+                              width: 30,
+                              height: 30,
+                            ),
                             SizedBox(width: 8),
-                            SelText('BCT'),
+                            SelText('Bayes Confirm.'),
                           ],
                         ),
                       ),
@@ -566,8 +577,11 @@ class _LFI1ScreenState extends State<LFI1Screen> {
                         value: 'Miracle',
                         child: Row(
                           children: [
-                            FaIcon(FontAwesomeIcons.wandMagic,
-                                size: 20, color: Colors.red),
+                            Image.asset(
+                              'assets/icons/wand-left.png',
+                              width: 30,
+                              height: 30,
+                            ),
                             SizedBox(width: 8),
                             SelText('Miracle'),
                           ],

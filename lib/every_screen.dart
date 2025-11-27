@@ -609,13 +609,13 @@ class _EveryScreenState extends State<EveryScreen> {
                           case 'Reset':
                             _reset();
                             break;
-                          case 'Reset PI':
+                          case 'Prob. Independency':
                             _resetPI();
                             break;
-                          case 'Reset BCT':
+                          case 'Bayes Confirm.':
                             _resetBCT();
                             break;
-                          case 'Reset BCT Corpus':
+                          case 'Bayes Confirm. Corpus':
                             _resetBCTCorpus();
                             break;
                         }
@@ -634,32 +634,32 @@ class _EveryScreenState extends State<EveryScreen> {
                         ),
                       ),
                       DropdownMenuItem(
-                        value: 'Reset PI',
+                        value: 'Prob. Independency',
                         child: Row(
                           children: const [
                             Icon(Icons.calculate, size: 20),
                             SizedBox(width: 8),
-                            SelText('Reset PI'),
+                            SelText('Prob. Independency'),
                           ],
                         ),
                       ),
                       DropdownMenuItem(
-                        value: 'Reset BCT',
+                        value: 'Bayes Confirm.',
                         child: Row(
                           children: const [
                             Icon(Icons.settings_backup_restore, size: 20),
                             SizedBox(width: 8),
-                            SelText('Reset BCT'),
+                            SelText('Bayes Confirm.'),
                           ],
                         ),
                       ),
                       // DropdownMenuItem(
-                      //   value: 'Reset BCT Corpus',
+                      //   value: 'Bayes Confirm. Corpus',
                       //   child: Row(
                       //     children: const [
                       //       Icon(Icons.settings_backup_restore, size: 20),
                       //       SizedBox(width: 8),
-                      //       SelText('Reset BCT Corpus'),
+                      //       SelText('Bayes Confirm. Corpus'),
                       //     ],
                       //   ),
                       // ),

@@ -89,7 +89,7 @@ class _LetkPlusScreenState extends State<LetkPlusScreen> {
   /// Truth variable table for the numLinesTruthTable probabilities
   /// Each sublist corresponds to a combination of A, B, C truth values
   late List<List<LetKTV>> _truthVariableTable;
-  String? _selectedResetOption = 'Reset PI';
+  String _selectedResetOption = 'Choose';
   // (c) Calculated results
   (int, int) _prA = (0, 1);
   (int, int) _prB = (0, 1);
@@ -711,21 +711,22 @@ class _LetkPlusScreenState extends State<LetkPlusScreen> {
                     isDense: true,
                     icon: const Icon(Icons.arrow_drop_down,
                         size: 25), // Reset icon
-                    hint: SelText(_selectedResetOption ?? 'Reset Options'),
+                    hint: SelText(_selectedResetOption),
                     onChanged: (String? newValue) {
+                      if (newValue == null) return;
                       setState(() {
                         _selectedResetOption = newValue;
                         switch (newValue) {
                           case 'Reset':
                             _reset();
                             break;
-                          case 'Reset PI':
+                          case 'Prob. Independency':
                             _resetPI();
                             break;
-                          case 'Reset BCT':
+                          case 'Bayes Confirm.':
                             _resetBCT();
                             break;
-                          // case 'Reset BCT Corpus':
+                          // case 'Bayes Confirm. Corpus':
                           //   _resetBCTCorpus();
                           //   break;
                           case 'Raven':
@@ -735,12 +736,11 @@ class _LetkPlusScreenState extends State<LetkPlusScreen> {
                             _resetMiracle();
                             break;
                         }
-                        _selectedResetOption = null;
                       });
                     },
                     items: [
                       DropdownMenuItem(
-                        value: 'Reset',
+                        value: 'Choose',
                         child: Row(
                           children: const [
                             Icon(Icons.restart_alt, size: 20),
@@ -750,22 +750,33 @@ class _LetkPlusScreenState extends State<LetkPlusScreen> {
                         ),
                       ),
                       DropdownMenuItem(
-                        value: 'Reset PI',
+                        value: 'Prob. Independency',
                         child: Row(
-                          children: const [
-                            Icon(Icons.calculate, size: 20),
-                            SizedBox(width: 8),
-                            SelText('Reset PI'),
+                          children: [
+                            Transform.rotate(
+                              angle: 0.785398, // 45 degrees in radians (π/4)
+                              child: const Text(
+                                '=',
+                                style: TextStyle(
+                                    fontSize: 25, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            const SelText('Prob. Independency'),
                           ],
                         ),
                       ),
                       DropdownMenuItem(
-                        value: 'Reset BCT',
+                        value: 'Bayes Confirm.',
                         child: Row(
-                          children: const [
-                            Icon(Icons.settings_backup_restore, size: 20),
+                          children: [
+                            Image.asset(
+                              'assets/icons/visual-bayes-theorem.png',
+                              width: 30,
+                              height: 30,
+                            ),
                             SizedBox(width: 8),
-                            SelText('Reset BCT'),
+                            SelText('Bayes Confirm.'),
                           ],
                         ),
                       ),
@@ -787,8 +798,11 @@ class _LetkPlusScreenState extends State<LetkPlusScreen> {
                         value: 'Miracle',
                         child: Row(
                           children: [
-                            FaIcon(FontAwesomeIcons.wandMagic,
-                                size: 20, color: Colors.red),
+                            Image.asset(
+                              'assets/icons/wand-left.png',
+                              width: 30,
+                              height: 30,
+                            ),
                             SizedBox(width: 8),
                             SelText('Miracle'),
                           ],
@@ -925,13 +939,13 @@ class _LetkPlusScreenState extends State<LetkPlusScreen> {
           7: (125, 2560),       // 1   1   1     125/2560
       */
       (LetKTV.f0, LetKTV.f0, LetKTV.f0): (1128, 2560),
-      (LetKTV.f0, LetKTV.f0, LetKTV.t0): (51, 2560),
-      (LetKTV.t0, LetKTV.f0, LetKTV.f0): (1125, 2560),
-      (LetKTV.t0, LetKTV.f0, LetKTV.t0): (0, 2560),
-      (LetKTV.f0, LetKTV.t0, LetKTV.f0): (21, 2560),
-      (LetKTV.f0, LetKTV.t0, LetKTV.t0): (80, 2560),
-      (LetKTV.t0, LetKTV.t0, LetKTV.f0): (30, 2560),
-      (LetKTV.t0, LetKTV.t0, LetKTV.t0): (125, 2560),
+      (LetKTV.f0, LetKTV.f0, LetKTV.b): (51, 2560),
+      (LetKTV.b, LetKTV.f0, LetKTV.f0): (1125, 2560),
+      (LetKTV.b, LetKTV.f0, LetKTV.b): (0, 2560),
+      (LetKTV.f0, LetKTV.b, LetKTV.f0): (21, 2560),
+      (LetKTV.f0, LetKTV.b, LetKTV.b): (80, 2560),
+      (LetKTV.b, LetKTV.b, LetKTV.f0): (30, 2560),
+      (LetKTV.b, LetKTV.b, LetKTV.b): (125, 2560),
 
       // (LetKTV.f0, LetKTV.f0, LetKTV.f0): (1128, 2560),
       // (LetKTV.f0, LetKTV.f0, LetKTV.t0): (51, 2560),
@@ -948,23 +962,15 @@ class _LetkPlusScreenState extends State<LetkPlusScreen> {
   }
 
   void _resetMiracle() {
-    // 0  0   6033/8192
+    // 0  0   8192/8192
     // 0  1      1/64
     // 1  0   1007/8192
     // 1  1      1/8
-    _initializeProbabilities(initialMap: {
-      // 0  0   6033/8192
-
-      0: (6033, 8192),
-
-      // 0  1      1/64
-      3: (128, 8192),
-
-      // 1  0   1007/8192
-      9: (1007, 8192),
-
-      // 1  1      1/8
-      12: (1024, 8192),
+    _initializeProbabilities(initialTruthMap: {
+      (LetKTV.f0, LetKTV.f0, LetKTV.f0): (6033, 8192),
+      (LetKTV.f0, LetKTV.b, LetKTV.f0): (128, 8192),
+      (LetKTV.b, LetKTV.f0, LetKTV.f0): (1007, 8192),
+      (LetKTV.b, LetKTV.b, LetKTV.f0): (1024, 8192),
     });
 
     _calculateAndDisplayProbabilities();

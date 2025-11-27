@@ -105,13 +105,18 @@ Widget table(
   var prBgivenA = div(prAB, prA);
   var prAgivenNotB = div(prANotB, prNotB);
 
+  // 'Pr(A) < 1/2'
   var lotteryAndMiraclesOne = lt(prA, (1, 2));
+  // 'Pr(A|B) > 1/2 '
   var lotteryAndMiraclesTwo = gt(prAgivenB, (1, 2));
+  // 'Pr(B|A) > 1/2 '
   var lotteryAndMiraclesThree = gt(prBgivenA, (1, 2));
 
+  // 'Pr(A|~B) >= Pr(B)'
   var lotteryAndMiraclesFour = ge(prAgivenNotB, prB);
   var lotteryAndMiraclesFiveLeft = sub(prAgivenB, prAgivenNotB);
   var lotteryAndMiraclesFiveRight = sub(prNotB, prB);
+  // 'Pr(A|B) - Pr(A|~B) <= Pr(~B) - Pr(B)'
   var lotteryAndMiraclesFive =
       le(lotteryAndMiraclesFiveLeft, lotteryAndMiraclesFiveRight);
 
@@ -167,7 +172,8 @@ Widget table(
   final scrollController = ScrollController();
 
   return DefaultTextStyle(
-    style: const TextStyle(fontSize: 12, color: Colors.black),
+    style: TextStyle(
+        fontSize: 12, color: eq(prSum, (1, 1)) ? Colors.black : Colors.red),
     child: Column(
       children: [
         Expanded(
@@ -459,13 +465,13 @@ Widget table(
                               child: Padding(
                                   padding: inSetCell,
                                   child: _buildResultRowStr(
-                                      '_prABC == _prAC  = ',
+                                      'Pr(A&B&C) == Pr(A&C)  = ',
                                       (prABC == prAC) ? 'True' : 'False'))),
                           TableCell(
                               child: Padding(
                                   padding: inSetCell,
                                   child: _buildResultRowStr(
-                                    'prNotB > prC = ',
+                                    'Pr(Not B) > Pr(C) = ',
                                     (gt(sub(div(prNotB, prC), div(prBC, prB)),
                                             (0, 1))
                                         ? 'True'
@@ -480,12 +486,12 @@ Widget table(
                               child: Padding(
                                   padding: inSetCell,
                                   child: _buildResultRow(
-                                      'prAC/_prC = ', div(prAC, prC)))),
+                                      'Pr(A&C)/Pr(C) = ', div(prAC, prC)))),
                           TableCell(
                               child: Padding(
                                   padding: inSetCell,
                                   child:
-                                      _buildResultRow('prANotB = ', prANotB))),
+                                      _buildResultRow('Pr(A&~B) = ', prANotB))),
                         ]),
 // _prANotB/_prNotB
 // _prANotBNotC
@@ -495,12 +501,12 @@ Widget table(
                               child: Padding(
                                   padding: inSetCell,
                                   child: _buildResultRow(
-                                      'prANotB/prNotB = ', aNotBdivprNotB))),
+                                      'Pr(A&~B)/Pr(~B) = ', aNotBdivprNotB))),
                           TableCell(
                               child: Padding(
                                   padding: inSetCell,
                                   child: _buildResultRow(
-                                      '_prANotBNotC = ', prANotBNotC))),
+                                      'Pr(A&~B&~C) = ', prANotBNotC))),
                         ]),
 // _prNotBNotC
 // _prANotBNotC/_prNotBNotC
@@ -510,12 +516,12 @@ Widget table(
                               child: Padding(
                                   padding: inSetCell,
                                   child: _buildResultRow(
-                                      '_prNotBNotC = ', prNotBNotC))),
+                                      'Pr(~B&~C) = ', prNotBNotC))),
                           TableCell(
                               child: Padding(
                                   padding: inSetCell,
                                   child: _buildResultRow(
-                                      'prANotBNotC/_prNotBNotC  = ',
+                                      'Pr(A&~B&~C)/Pr(~B&~C)  = ',
                                       aNotBNotCdivprNotBNotC))),
                         ]),
 
@@ -526,15 +532,15 @@ Widget table(
                               child: Padding(
                                   padding: inSetCell,
                                   child: _buildResultRowStr(
-                                      'prANotBNotC/_prNotBNotC <= _prA',
-                                      gt(prA, aNotBNotCdivprNotBNotC)
+                                      'Pr(A&~B&~C)/Pr(~B&~C) <= Pr(A)',
+                                      le(aNotBNotCdivprNotBNotC, prA)
                                           ? 'True'
                                           : 'False'))),
                           TableCell(
                               child: Padding(
                                   padding: inSetCell,
                                   child: _buildResultRow(
-                                      'prABNotC = ', prABNotC))),
+                                      'Pr(A&B&~C) = ', prABNotC))),
                         ]),
 
 // _prABNotC/_prBNotC
@@ -544,14 +550,14 @@ Widget table(
                           TableCell(
                               child: Padding(
                                   padding: inSetCell,
-                                  child: _buildResultRow(
-                                      'prABNotC/_prBNotC', aBNotCdivprBNotC))),
+                                  child: _buildResultRow('Pr(A&B&~C)/Pr(B&~C)',
+                                      aBNotCdivprBNotC))),
                           TableCell(
                               child: Padding(
                                   padding: inSetCell,
                                   child: _buildResultRowStr(
-                                      'prABNotC/prBNotC >= prA',
-                                      gt(aBNotCdivprBNotC, prA)
+                                      'Pr(A&B&~C)/Pr(B&~C) >= Pr(A)',
+                                      ge(aBNotCdivprBNotC, prA)
                                           ? 'True'
                                           : 'False'))),
                         ]),
