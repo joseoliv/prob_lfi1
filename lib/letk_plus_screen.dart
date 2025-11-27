@@ -112,9 +112,9 @@ class _LetkPlusScreenState extends State<LetkPlusScreen> {
   (int, int) _prCNotAB = (0, 1);
   (int, int) _prCNotBA = (0, 1);
   (int, int) _prNotAandB = (0, 1);
-  final (int, int) _prANotBNotC = (0, 1);
-  final (int, int) _prNotBNotC = (0, 1);
-  final (int, int) _prABNotC = (0, 1);
+  (int, int) _prANotBNotC = (0, 1);
+  (int, int) _prNotBNotC = (0, 1);
+  (int, int) _prABNotC = (0, 1);
 
   String _prANumeratorSum = '';
   String _prBNumeratorSum = '';
@@ -413,12 +413,19 @@ class _LetkPlusScreenState extends State<LetkPlusScreen> {
 
       _prSum = addFractions(_prSum, currentProb);
 
-      bool aIsTrue = _truthVariableTable[flatIndex][0].designated();
-      bool bIsTrue = _truthVariableTable[flatIndex][1].designated();
-      bool cIsTrue = _truthVariableTable[flatIndex][2].designated();
-      bool notAIsTrue = _truthVariableTable[flatIndex][0].not().designated();
-      bool notBIsTrue = _truthVariableTable[flatIndex][1].not().designated();
-      bool notCIsTrue = _truthVariableTable[flatIndex][2].not().designated();
+      if (currentProb.$1 == 0) {
+        continue;
+      }
+
+      LetKTV aValue = _truthVariableTable[flatIndex][0];
+      LetKTV bValue = _truthVariableTable[flatIndex][1];
+      LetKTV cValue = _truthVariableTable[flatIndex][2];
+      bool aIsTrue = aValue.designated();
+      bool bIsTrue = bValue.designated();
+      bool cIsTrue = cValue.designated();
+      bool notAIsTrue = aValue.not().designated();
+      bool notBIsTrue = bValue.not().designated();
+      bool notCIsTrue = cValue.not().designated();
 
       if (currentProb.$1 == 0) {
         // If the probability is 0, skip further calculations for this entry
@@ -555,6 +562,21 @@ class _LetkPlusScreenState extends State<LetkPlusScreen> {
       }
       if (bIsTrue && notCIsTrue) {
         _prBNotC = addFractions(_prBNotC, currentProb);
+      }
+      /*
+  final (int, int) _prANotBNotC = (0, 1);
+  final (int, int) _prNotBNotC = (0, 1);
+  final (int, int) _prABNotC = (0, 1);
+
+      */
+      if (aIsTrue && notBIsTrue && notCIsTrue) {
+        _prANotBNotC = addFractions(_prANotBNotC, currentProb);
+      }
+      if (notBIsTrue && notCIsTrue) {
+        _prNotBNotC = addFractions(_prNotBNotC, currentProb);
+      }
+      if (aIsTrue && bIsTrue && notCIsTrue) {
+        _prABNotC = addFractions(_prABNotC, currentProb);
       }
     }
     // Update state to re-render the UI
@@ -918,8 +940,8 @@ class _LetkPlusScreenState extends State<LetkPlusScreen> {
       // (LetKTV.f0, LetKTV.t0, LetKTV.f0): (21, 2560),
       // (LetKTV.f0, LetKTV.t0, LetKTV.t0): (80, 2560),
       // (LetKTV.t0, LetKTV.t0, LetKTV.f0): (30, 2560),
-      // (LetKTV.t0, LetKTV.t0, LetKTV.t0): (125, 2560),    
-      });
+      // (LetKTV.t0, LetKTV.t0, LetKTV.t0): (125, 2560),
+    });
 
     _calculateAndDisplayProbabilities();
     setState(() {});
