@@ -16,7 +16,7 @@ class EveryScreen extends StatefulWidget {
   State<EveryScreen> createState() => _EveryScreenState();
 }
 
-class _EveryScreenState extends State<EveryScreen> {
+class _EveryScreenState extends State<EveryScreen> implements ILogic{
   // --- State Variables ---
 
   // (b) probValues and related
@@ -28,7 +28,6 @@ class _EveryScreenState extends State<EveryScreen> {
   /// Truth variable table for the numLinesTruthTable probabilities
   /// Each sublist corresponds to a combination of A, B, C truth values
   late List<List<int>> _truthVariableTable;
-  String? _selectedResetOption;
   // (c) Calculated results
   (int, int) _prA = (0, 1);
   (int, int) _prB = (0, 1);
@@ -70,14 +69,15 @@ class _EveryScreenState extends State<EveryScreen> {
   @override
   void initState() {
     super.initState();
-    _initializeProbabilities();
+    initializeProbabilities();
   }
 
   // --- Undo/Redo Logic ---
   // a circular buffer to store the last 10 changes
   final UndoRedoManager<List<String>> _undoRedoManager = UndoRedoManager();
 
-  void _undoLastChange() {
+  @override
+  void undoLastChange() {
     if (_undoRedoManager.canUndo()) {
       List<Object> objList = _undoRedoManager.undo() ?? _probValues;
       List<String> strList = objList.cast<String>();
@@ -93,8 +93,8 @@ class _EveryScreenState extends State<EveryScreen> {
         // A more robust solution might halt calculation or highlight fields.
       }
 
-      _initializeProbabilities(initialValues: _probValues);
-      _calculateAndDisplayProbabilities();
+      initializeProbabilities(initialValues: _probValues);
+      calculateAndDisplayProbabilities();
       setState(() {});
     } else {
       /// show a SnackBar if there is no undo available for 1 second
@@ -107,7 +107,8 @@ class _EveryScreenState extends State<EveryScreen> {
     }
   }
 
-  void _redoLastChange() {
+  @override
+  void redoLastChange() {
     if (_undoRedoManager.canRedo()) {
       List<Object> objList = _undoRedoManager.redo() ?? _probValues;
       List<String> strList = objList.cast<String>();
@@ -119,8 +120,8 @@ class _EveryScreenState extends State<EveryScreen> {
         // A more robust solution might halt calculation or highlight fields.
       }
 
-      _initializeProbabilities(initialValues: _probValues);
-      _calculateAndDisplayProbabilities();
+      initializeProbabilities(initialValues: _probValues);
+      calculateAndDisplayProbabilities();
       setState(() {});
     } else {
       /// show a SnackBar if there is no redo available for 1 second
@@ -138,7 +139,7 @@ class _EveryScreenState extends State<EveryScreen> {
   //     {List<(int, int)>? initialValues,
   //     Map<int, List<(int, int)>>? initialMap}) {
 
-  void _initializeProbabilities(
+  void initializeProbabilities(
       {List<(int, int)>? initialValues, Map<int, (int, int)>? initialMap}) {
     _probValues = List.filled(numLinesTruthTable, (0, 1));
     if (initialMap != null) {
@@ -223,7 +224,8 @@ class _EveryScreenState extends State<EveryScreen> {
   }
 
   // --- Calculation Logic ---
-  void _calculateAndDisplayProbabilities() {
+  @override
+  void calculateAndDisplayProbabilities() {
     // put in the undo/redo manager
 
     // 1. Parse all TextField values and store them in _probValues
@@ -557,77 +559,7 @@ class _EveryScreenState extends State<EveryScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Wrap(
-            spacing: 10.0,
-            runSpacing: 10.0,
-            children: [
-              ElevatedButton(
-                onPressed: _undoLastChange,
-                child: Icon(Icons.undo_outlined, size: 20),
-              ),
-              ElevatedButton(
-                onPressed: _redoLastChange,
-                child: Icon(Icons.redo_outlined, size: 20),
-              ),
-              ElevatedButton(
-                onPressed: _calculateAndDisplayProbabilities,
-                child: SelText('Calculate'),
-              ),
-
-              SizedBox(width: 8), // Space between buttons
-              ElevatedButton(
-                onPressed: () {
-                  _showText();
-                },
-                child: SelText('Text'),
-              ),
-              DropdownButtonHideUnderline(
-                child: Container(
-                  padding: EdgeInsets.fromLTRB(12, 3, 12, 5),
-
-                  /// a rounded border to the DropdownButton
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: const Color.fromARGB(
-                          255, 96, 139, 109), // Border color
-                      width: 1, // Border width
-                    ),
-                    color: const Color.fromARGB(
-                        255, 215, 234, 238), // Same as ElevatedButton default
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: DropdownButton<String>(
-                    value: _selectedResetOption,
-                    isDense: true,
-                    icon: const Icon(Icons.arrow_drop_down,
-                        size: 25), // Reset icon
-                    hint: const SelText('Reset options'),
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        _selectedResetOption = newValue;
-                        switch (newValue) {
-                          case 'Reset':
-                            _reset();
-                            break;
-                          case 'Prob. Independency':
-                            _resetPI();
-                            break;
-                          case 'Bayes Confirm.':
-                            _resetBCT();
-                            break;
-                          case 'Bayes Confirm. Corpus':
-                            _resetBCTCorpus();
-                            break;
-                        }
-                        _selectedResetOption = null;
-                      });
-                    },
-                    items:ddMenuItemList,
-                  ),
-                ),
-              ),
-            ],
-          ),
+          wrapToButtons(this,_prSum),
           const SizedBox(height: 15),
           Expanded(
               child: table(
@@ -661,9 +593,10 @@ class _EveryScreenState extends State<EveryScreen> {
     );
   }
 
-  void _resetBCT() {
+  @override
+  void resetBCT() {
     setState(() {});
-    _initializeProbabilities(
+    initializeProbabilities(
       initialMap: {
         21: (835, 5120),
         22: (125, 5120),
@@ -676,31 +609,54 @@ class _EveryScreenState extends State<EveryScreen> {
         63: (100, 5120)
       },
     );
-    _calculateAndDisplayProbabilities();
+    calculateAndDisplayProbabilities();
   }
 
-  void _resetBCTCorpus() {
+@override
+  void resetRaven() {
     setState(() {});
-    _initializeProbabilities(
+    initializeProbabilities(
       initialMap: {
-        21: (735, 5120),
-        22: (225, 5120),
-        25: (1341, 5120),
-        26: (1539, 5120),
-        37: (193, 5120),
-        38: (127, 5120),
-        41: (291, 5120),
-        42: (669, 5120),
-        //47: (127, 5120),
-        //63: (100, 5120)
       },
     );
-    _calculateAndDisplayProbabilities();
+    calculateAndDisplayProbabilities();
   }
 
-  void _resetPI() {
+
+@override
+  void resetMiracle() {
+    setState(() {});
+    initializeProbabilities(
+      initialMap: {
+      },
+    );
+    calculateAndDisplayProbabilities();
+  }
+
+
+  // void _resetBCTCorpus() {
+  //   setState(() {});
+  //   initializeProbabilities(
+  //     initialMap: {
+  //       21: (735, 5120),
+  //       22: (225, 5120),
+  //       25: (1341, 5120),
+  //       26: (1539, 5120),
+  //       37: (193, 5120),
+  //       38: (127, 5120),
+  //       41: (291, 5120),
+  //       42: (669, 5120),
+  //       //47: (127, 5120),
+  //       //63: (100, 5120)
+  //     },
+  //   );
+  //   calculateAndDisplayProbabilities();
+  // }
+
+  @override
+  void resetPI() {
     setState(() {
-      _initializeProbabilities(initialMap: {
+      initializeProbabilities(initialMap: {
         /*
         21: 0 1 0 1 0 1 : 1459/2000
 23: 0 1 0 1 1 1 :  161/2000
@@ -726,14 +682,15 @@ class _EveryScreenState extends State<EveryScreen> {
         63: (1, 2000),
       });
 
-      _calculateAndDisplayProbabilities();
+      calculateAndDisplayProbabilities();
     });
   }
 
-  void _reset() {
+  @override
+  void reset() {
     setState(() {
-      _initializeProbabilities();
-      _calculateAndDisplayProbabilities();
+      initializeProbabilities();
+      calculateAndDisplayProbabilities();
     });
   }
 
@@ -760,7 +717,8 @@ class _EveryScreenState extends State<EveryScreen> {
     );
   }
 
-  void _showText() {
+  @override
+  void showText() {
     var text = r'\begin{align*}' '\n';
     String intToTruthValue(int i) {
       switch (i) {

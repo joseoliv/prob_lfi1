@@ -12,7 +12,7 @@ class CiScreen extends StatefulWidget {
   State<CiScreen> createState() => _CiScreenState();
 }
 
-class _CiScreenState extends State<CiScreen> {
+class _CiScreenState extends State<CiScreen> implements ILogic {
   // --- State Variables ---
 
   // (b) probValues and related
@@ -23,7 +23,6 @@ class _CiScreenState extends State<CiScreen> {
   /// Truth variable table for the 27 probabilities
   /// Each sublist corresponds to a combination of A, B, C truth values
   late List<List<int>> _truthVariableTable;
-  String? _selectedResetOption;
   // (c) Calculated results
   (int, int) _prA = (0, 1);
   (int, int) _prB = (0, 1);
@@ -62,19 +61,18 @@ class _CiScreenState extends State<CiScreen> {
   String _prCNotANumeratorSum = '';
   String _prCNotBNumeratorSum = '';
 
-  final TextEditingController _nameController = TextEditingController();
-
   @override
   void initState() {
     super.initState();
-    _initializeProbabilities();
+    initializeProbabilities();
   }
 
   // --- Undo/Redo Logic ---
   // a circular buffer to store the last 10 changes
   final UndoRedoManager<List<String>> _undoRedoManager = UndoRedoManager();
 
-  void _undoLastChange() {
+  @override
+  void undoLastChange() {
     if (_undoRedoManager.canUndo()) {
       List<Object> objList = _undoRedoManager.undo() ?? _probValues;
       List<String> strList = objList.cast<String>();
@@ -86,8 +84,8 @@ class _CiScreenState extends State<CiScreen> {
         // A more robust solution might halt calculation or highlight fields.
       }
 
-      _initializeProbabilities(initialValues: _probValues);
-      _calculateAndDisplayProbabilities();
+      initializeProbabilities(initialValues: _probValues);
+      calculateAndDisplayProbabilities();
       setState(() {});
     } else {
       /// show a SnackBar if there is no undo available for 1 second
@@ -100,7 +98,8 @@ class _CiScreenState extends State<CiScreen> {
     }
   }
 
-  void _redoLastChange() {
+  @override
+  void redoLastChange() {
     if (_undoRedoManager.canRedo()) {
       List<Object> objList = _undoRedoManager.redo() ?? _probValues;
       List<String> strList = objList.cast<String>();
@@ -112,8 +111,8 @@ class _CiScreenState extends State<CiScreen> {
         // A more robust solution might halt calculation or highlight fields.
       }
 
-      _initializeProbabilities(initialValues: _probValues);
-      _calculateAndDisplayProbabilities();
+      initializeProbabilities(initialValues: _probValues);
+      calculateAndDisplayProbabilities();
       setState(() {});
     } else {
       /// show a SnackBar if there is no redo available for 1 second
@@ -126,7 +125,7 @@ class _CiScreenState extends State<CiScreen> {
     }
   }
 
-  void _initializeProbabilities(
+  void initializeProbabilities(
       {List<(int, int)>? initialValues,
       Map<int, List<(int, int)>>? initialMap}) {
     _probValues = List.filled(27, (0, 1));
@@ -219,7 +218,8 @@ class _CiScreenState extends State<CiScreen> {
   }
 
   // --- Calculation Logic ---
-  void _calculateAndDisplayProbabilities() {
+  @override
+  void calculateAndDisplayProbabilities() {
     // put in the undo/redo manager
 
     // 1. Parse all TextField values and store them in _probValues
@@ -498,93 +498,7 @@ class _CiScreenState extends State<CiScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Wrap(
-            spacing: 10.0,
-            runSpacing: 10.0,
-            children: [
-              ElevatedButton(
-                onPressed: _undoLastChange,
-                child: Icon(Icons.undo_outlined, size: 20),
-              ),
-              ElevatedButton(
-                onPressed: _redoLastChange,
-                child: Icon(Icons.redo_outlined, size: 20),
-              ),
-              ElevatedButton(
-                onPressed: _calculateAndDisplayProbabilities,
-                child: SelText('Calculate'),
-              ),
-
-              SizedBox(width: 8), // Space between buttons
-              ElevatedButton(
-                onPressed: () {
-                  _showText();
-                },
-                child: SelText('Text'),
-              ),
-              DropdownButtonHideUnderline(
-                child: Container(
-                  padding: EdgeInsets.fromLTRB(12, 3, 12, 5),
-
-                  /// a rounded border to the DropdownButton
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: const Color.fromARGB(
-                          255, 96, 139, 109), // Border color
-                      width: 1, // Border width
-                    ),
-                    color: const Color.fromARGB(
-                        255, 215, 234, 238), // Same as ElevatedButton default
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: DropdownButton<String>(
-                    value: _selectedResetOption,
-                    isDense: true,
-                    icon: const Icon(Icons.arrow_drop_down,
-                        size: 25), // Reset icon
-                    hint: const SelText('Reset options'),
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        _selectedResetOption = newValue;
-                        switch (newValue) {
-                          case 'Reset':
-                            _reset();
-                            break;
-                          case 'PI':
-                            _resetPI();
-                            break;
-                          case 'BCT':
-                            _resetBCT();
-                            break;
-                          case 'Raven':
-                            _resetRaven();
-                            break;
-                        }
-                        _selectedResetOption = null;
-                      });
-                    },
-                    items:ddMenuItemList,
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 120,
-                height: 30,
-                child: TextField(
-                  controller: _nameController,
-
-                  /// add a rounded border to the TextField
-                  decoration: InputDecoration(
-                    labelText: 'Name',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(width: 8),
-            ],
-          ),
+          wrapToButtons(this, _prSum),
           const SizedBox(height: 15),
           Expanded(
               child: table(
@@ -618,9 +532,10 @@ class _CiScreenState extends State<CiScreen> {
     );
   }
 
-  void _resetBCT() {
+  @override
+  void resetBCT() {
     setState(() {});
-    _initializeProbabilities(
+    initializeProbabilities(
       initialMap: {
         0: [(835, 5120)],
         1: [(125, 5120)],
@@ -662,12 +577,13 @@ class _CiScreenState extends State<CiScreen> {
       //   (669, 5120)
       // ]
     );
-    _calculateAndDisplayProbabilities();
+    calculateAndDisplayProbabilities();
   }
 
-  void _resetPI() {
+  @override
+  void resetPI() {
     setState(() {
-      _initializeProbabilities(initialValues: [
+      initializeProbabilities(initialValues: [
         (1459, 2000),
         (0, 1),
         (161, 2000),
@@ -697,13 +613,14 @@ class _CiScreenState extends State<CiScreen> {
         (1, 2000)
       ]);
 
-      _calculateAndDisplayProbabilities();
+      calculateAndDisplayProbabilities();
     });
   }
 
-  void _resetRaven() {
+  @override
+  void resetRaven() {
     setState(() {
-      _initializeProbabilities(
+      initializeProbabilities(
         initialMap: {
           0: [(1000, 2650)],
 
@@ -734,14 +651,84 @@ class _CiScreenState extends State<CiScreen> {
           /// 1/2 1/2 1/2
         },
       );
-      _calculateAndDisplayProbabilities();
+      calculateAndDisplayProbabilities();
     });
   }
 
-  void _reset() {
+  @override
+  void resetMiracle() {
+    // 0  0   6033/8192
+    // 0  1      1/64
+    // 1  0   1007/8192
+    // 1  1      1/8
+    initializeProbabilities(initialMap: {
+      // 0  0   6033/8192
+
+      0: [(6033, 8192)],
+
+      // 0  1      1/64
+      6: [(128, 8192)],
+
+      // 1  0   1007/8192
+      18: [(1007, 8192)],
+
+      // 1  1      1/8
+      26: [(1024, 8192)],
+    });
+
+    calculateAndDisplayProbabilities();
+    setState(() {});
+  }
+
+/*
+  @override
+  void resetMiracle() {
     setState(() {
-      _initializeProbabilities();
-      _calculateAndDisplayProbabilities();
+      initializeProbabilities(
+        initialMap: {
+          0: [(1000, 2650)],
+
+          ///  0   0  0
+          2: [(88, 2650)],
+
+          ///  0   0 1/2
+          6: [(36, 2650)],
+
+          ///  0  1/2  0
+          8: [(138, 2650)],
+
+          ///  0  1/2 1/2
+
+          //26: [(940, 2650)],
+          ///  1   1   1
+
+          19: [(181, 2650)],
+
+          /// 1/2  0   0
+
+          20: [(0, 2650)],
+
+          /// 1/2  0  1/2
+
+          24: [(52, 2650)],
+
+          /// 1/2 1/2  0
+
+          26: [(940 + 215, 2650)],
+
+          /// 1/2 1/2 1/2
+        },
+      );
+      calculateAndDisplayProbabilities();
+    });
+  }
+  */
+
+  @override
+  void reset() {
+    setState(() {
+      initializeProbabilities();
+      calculateAndDisplayProbabilities();
     });
   }
 
@@ -768,7 +755,8 @@ class _CiScreenState extends State<CiScreen> {
     );
   }
 
-  void _showText() {
+  @override
+  void showText() {
     var text = r'\begin{align*}' '\n';
     String intToTruthValue(int i) {
       switch (i) {

@@ -16,7 +16,7 @@ class ClassicalScreen extends StatefulWidget {
   State<ClassicalScreen> createState() => _ClassicalScreenState();
 }
 
-class _ClassicalScreenState extends State<ClassicalScreen> {
+class _ClassicalScreenState extends State<ClassicalScreen> implements ILogic {
   // --- State Variables ---
 
   // (b) probValues and related
@@ -28,7 +28,6 @@ class _ClassicalScreenState extends State<ClassicalScreen> {
   /// Truth variable table for the numLinesTruthTable probabilities
   /// Each sublist corresponds to a combination of A, B, C truth values
   late List<List<int>> _truthVariableTable;
-  String? _selectedResetOption;
   // (c) Calculated results
   (int, int) _prA = (0, 1);
   (int, int) _prB = (0, 1);
@@ -73,14 +72,15 @@ class _ClassicalScreenState extends State<ClassicalScreen> {
   @override
   void initState() {
     super.initState();
-    _initializeProbabilities();
+    initializeProbabilities();
   }
 
   // --- Undo/Redo Logic ---
   // a circular buffer to store the last 10 changes
   final UndoRedoManager<List<String>> _undoRedoManager = UndoRedoManager();
 
-  void _undoLastChange() {
+  @override
+  void undoLastChange() {
     if (_undoRedoManager.canUndo()) {
       List<Object> objList = _undoRedoManager.undo() ?? _probValues;
       List<String> strList = objList.cast<String>();
@@ -90,8 +90,8 @@ class _ClassicalScreenState extends State<ClassicalScreen> {
         _probValues[i] = parsed;
       }
 
-      _initializeProbabilities(initialValues: _probValues);
-      _calculateAndDisplayProbabilities();
+      initializeProbabilities(initialValues: _probValues);
+      calculateAndDisplayProbabilities();
       setState(() {});
     } else {
       /// show a SnackBar if there is no undo available for 1 second
@@ -104,7 +104,8 @@ class _ClassicalScreenState extends State<ClassicalScreen> {
     }
   }
 
-  void _redoLastChange() {
+  @override
+  void redoLastChange() {
     if (_undoRedoManager.canRedo()) {
       List<Object> objList = _undoRedoManager.redo() ?? _probValues;
       List<String> strList = objList.cast<String>();
@@ -113,8 +114,8 @@ class _ClassicalScreenState extends State<ClassicalScreen> {
         _probValues[i] = parsed;
       }
 
-      _initializeProbabilities(initialValues: _probValues);
-      _calculateAndDisplayProbabilities();
+      initializeProbabilities(initialValues: _probValues);
+      calculateAndDisplayProbabilities();
       setState(() {});
     } else {
       /// show a SnackBar if there is no redo available for 1 second
@@ -127,7 +128,7 @@ class _ClassicalScreenState extends State<ClassicalScreen> {
     }
   }
 
-  void _initializeProbabilities(
+  void initializeProbabilities(
       {List<(int, int)>? initialValues, Map<int, (int, int)>? initialMap}) {
     _probValues = List.filled(numLinesTruthTable, (0, 1));
     if (initialMap != null) {
@@ -210,7 +211,8 @@ class _ClassicalScreenState extends State<ClassicalScreen> {
   }
 
   // --- Calculation Logic ---
-  void _calculateAndDisplayProbabilities() {
+  @override
+  void calculateAndDisplayProbabilities() {
     // put in the undo/redo manager
 
     // 1. Parse all TextField values and store them in _probValues
@@ -621,7 +623,19 @@ class _ClassicalScreenState extends State<ClassicalScreen> {
     return Container(
       color: creamTea,
       padding: const EdgeInsets.all(12.0),
-      child: valuationProbList(8, 0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(child: valuationProbList(8, 0)),
+          SizedBox(height: 10),
+          SizedBox(
+              height: 400,
+              child: SelText(
+                  'The Bayesian Confirmation Theory example shows just one of the results of the Fitelson article.'
+                  'The Lottery of Miracles example is just one of the two Fitelson examples.'))
+        ],
+      ),
     );
   }
 
@@ -681,77 +695,7 @@ class _ClassicalScreenState extends State<ClassicalScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Wrap(
-            spacing: 10.0,
-            runSpacing: 10.0,
-            children: [
-              ElevatedButton(
-                onPressed: _undoLastChange,
-                child: Icon(Icons.undo_outlined, size: 20),
-              ),
-              ElevatedButton(
-                onPressed: _redoLastChange,
-                child: Icon(Icons.redo_outlined, size: 20),
-              ),
-              ElevatedButton(
-                onPressed: _calculateAndDisplayProbabilities,
-                child: SelText('Calculate'),
-              ),
-
-              SizedBox(width: 8), // Space between buttons
-              ElevatedButton(
-                onPressed: () {
-                  _showText();
-                },
-                child: SelText('Text'),
-              ),
-              DropdownButtonHideUnderline(
-                child: Container(
-                  padding: EdgeInsets.fromLTRB(12, 3, 12, 5),
-
-                  /// a rounded border to the DropdownButton
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: const Color.fromARGB(
-                          255, 96, 139, 109), // Border color
-                      width: 1, // Border width
-                    ),
-                    color: const Color.fromARGB(
-                        255, 215, 234, 238), // Same as ElevatedButton default
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: DropdownButton<String>(
-                    value: _selectedResetOption,
-                    isDense: true,
-                    icon: const Icon(Icons.arrow_drop_down,
-                        size: 25), // Reset icon
-                    hint: const SelText('Reset options'),
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        _selectedResetOption = newValue;
-                        switch (newValue) {
-                          case 'Reset':
-                            _reset();
-                            break;
-                          case 'Prob. Independency':
-                            _resetPI();
-                            break;
-                          case 'Bayes Confirm.':
-                            _resetBCT();
-                            break;
-                          case 'Reset Raven':
-                            _resetRaven();
-                            break;
-                        }
-                        _selectedResetOption = null;
-                      });
-                    },
-                    items: ddMenuItemList,
-                  ),
-                ),
-              ),
-            ],
-          ),
+          wrapToButtons(this, _prSum),
           const SizedBox(height: 15),
           Expanded(child: Builder(builder: (context) {
             return table(
@@ -786,9 +730,10 @@ class _ClassicalScreenState extends State<ClassicalScreen> {
     );
   }
 
-  void _resetBCT() {
+  @override
+  void resetBCT() {
     setState(() {});
-    _initializeProbabilities(initialMap: {
+    initializeProbabilities(initialMap: {
       /*
       0: 010101: 735
 1: 010111: 225
@@ -800,6 +745,17 @@ class _ClassicalScreenState extends State<ClassicalScreen> {
 8: 111111: 669
 
       */
+
+      // 0: (669, 5120),
+      // 1: (1539, 5120),
+      // 2: (127, 5120),
+      // 3: (291, 5120),
+      // 4: (225, 5120),
+      // 5: (1341, 5120),
+      // 6: (193, 5120),
+      // 7: (735, 5120),
+
+      /// this is the original values from the BCT example
       0: (735, 5120),
       1: (225, 5120),
       2: (1341, 5120),
@@ -809,12 +765,13 @@ class _ClassicalScreenState extends State<ClassicalScreen> {
       6: (291, 5120),
       7: (669, 5120),
     });
-    _calculateAndDisplayProbabilities();
+    calculateAndDisplayProbabilities();
   }
 
-  void _resetPI() {
+  @override
+  void resetPI() {
     setState(() {
-      _initializeProbabilities(initialMap: {
+      initializeProbabilities(initialMap: {
         /*
 
         */
@@ -828,12 +785,13 @@ class _ClassicalScreenState extends State<ClassicalScreen> {
         7: (1, 2000),
       });
 
-      _calculateAndDisplayProbabilities();
+      calculateAndDisplayProbabilities();
     });
   }
 
-  void _resetRaven() {
-    _initializeProbabilities(
+  @override
+  void resetRaven() {
+    initializeProbabilities(
         /*
 
  0   0   0    1128/2560
@@ -868,15 +826,40 @@ class _ClassicalScreenState extends State<ClassicalScreen> {
           7: (125, 2560), // 1   1   1     125/2560
         });
 
-    _calculateAndDisplayProbabilities();
+    calculateAndDisplayProbabilities();
     setState(() {});
   }
-  // 25/512 + 3/256 + 1/32 + 21/2560 + 225/512 + 51/2560 + 141/320
 
-  void _reset() {
+  @override
+  void resetMiracle() {
+    // 0  0   6033/8192
+    // 0  1      1/64
+    // 1  0   1007/8192
+    // 1  1      1/8
+    initializeProbabilities(initialMap: {
+      // 0  0   6033/8192
+
+      0: (6033, 8192),
+
+      // 0  1      1/64
+      2: (128, 8192),
+
+      // 1  0   1007/8192
+      4: (1007, 8192),
+
+      // 1  1      1/8
+      7: (1024, 8192),
+    });
+
+    calculateAndDisplayProbabilities();
+    setState(() {});
+  }
+
+  @override
+  void reset() {
     setState(() {
-      _initializeProbabilities();
-      _calculateAndDisplayProbabilities();
+      initializeProbabilities();
+      calculateAndDisplayProbabilities();
     });
   }
 
@@ -903,7 +886,8 @@ class _ClassicalScreenState extends State<ClassicalScreen> {
     );
   }
 
-  void _showText() {
+  @override
+  void showText() {
     var text = r'\begin{align*}' '\n';
     String intToTruthValue(int i) {
       switch (i) {

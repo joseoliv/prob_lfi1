@@ -5,7 +5,6 @@ import 'package:flutter/foundation.dart'; // For kIsWeb
 import 'package:flutter/services.dart';
 import 'package:prob_lfi1/common_lib.dart';
 import 'package:prob_lfi1/fraction.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 const String lfi1Filename = 'C:\\Users\\josed\\Downloads\\probSum_lfi1.txt';
 
@@ -16,14 +15,13 @@ class LFI1Screen extends StatefulWidget {
   State<LFI1Screen> createState() => _LFI1ScreenState();
 }
 
-class _LFI1ScreenState extends State<LFI1Screen> {
+class _LFI1ScreenState extends State<LFI1Screen> implements ILogic {
   // --- State Variables ---
 
   // (b) probValues and related
   late List<TextEditingController> _textControllers;
   late List<(int, int)> _probValues;
   late List<String> _probLabels;
-  String _selectedResetOption = 'Choose';
   // (c) Calculated results
   (int, int) _prA = (0, 1);
   (int, int) _prB = (0, 1);
@@ -62,15 +60,18 @@ class _LFI1ScreenState extends State<LFI1Screen> {
 
   final List<String> _valueStrings = ["  0", "1/2", "  1"];
 
-  final TextEditingController _nameController = TextEditingController();
-
   @override
   void initState() {
     super.initState();
-    _initializeProbabilities();
+    initializeProbabilities();
   }
 
-  void _initializeProbabilities(
+  @override
+  void redoLastChange() {}
+  @override
+  void undoLastChange() {}
+
+  void initializeProbabilities(
       {List<(int, int)>? initialValues,
       Map<int, List<(int, int)>>? initialMap}) {
     _probValues = List.filled(27, (0, 1));
@@ -163,7 +164,8 @@ class _LFI1ScreenState extends State<LFI1Screen> {
   }
 
   // --- Calculation Logic ---
-  void _calculateAndDisplayProbabilities() {
+  @override
+  void calculateAndDisplayProbabilities() {
     // delete a file named 'C:\Users\josed\Downloads\probSum_lfi1.txt'
     // only if the platform is Windows
     if (getPlatform() == 'Windows') {
@@ -453,92 +455,7 @@ class _LFI1ScreenState extends State<LFI1Screen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Wrap(
-            spacing: 10.0,
-            runSpacing: 10.0,
-            children: [
-              ElevatedButton(
-                onPressed: _calculateAndDisplayProbabilities,
-                child: SelText('Calculate'),
-              ),
-              SizedBox(width: 8), // Space between buttons
-              ElevatedButton(
-                onPressed: () {
-                  _showText();
-                },
-                child: SelText('Text'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  _showSumText();
-                },
-                child: SelText('Fraction Sums'),
-              ),
-              DropdownButtonHideUnderline(
-                child: Container(
-                  padding: EdgeInsets.fromLTRB(12, 3, 12, 5),
-
-                  /// a rounded border to the DropdownButton
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Colors.blueGrey, // Border color
-                      width: 1, // Border width
-                    ),
-                    color: const Color.fromARGB(
-                        255, 215, 234, 238), // Same as ElevatedButton default
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: DropdownButton<String>(
-                    value: _selectedResetOption,
-                    isDense: true,
-                    icon: const Icon(Icons.arrow_drop_down,
-                        size: 25), // Reset icon
-                    hint: SelText(_selectedResetOption),
-                    onChanged: (String? newValue) {
-                      if (newValue == null) return;
-                      setState(() {
-                        _selectedResetOption = newValue;
-                        switch (newValue) {
-                          case 'Reset':
-                            _reset();
-                            break;
-                          case 'Prob. Independency':
-                            _resetPI();
-                            break;
-                          case 'Bayes Confirm.':
-                            _resetBCT();
-                            break;
-                          case 'Raven':
-                            _resetRaven();
-                            break;
-                          case 'Miracle':
-                            _resetMiracle();
-                            break;
-                        }
-                      });
-                    },
-                    items: ddMenuItemList,
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 120,
-                height: 30,
-                child: TextField(
-                  controller: _nameController,
-
-                  /// add a rounded border to the TextField
-                  decoration: InputDecoration(
-                    labelText: 'Name',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(width: 8),
-            ],
-          ),
+          wrapToButtons(this, _prSum),
           const SizedBox(height: 15),
           Expanded(
               child: table(
@@ -572,9 +489,10 @@ class _LFI1ScreenState extends State<LFI1Screen> {
     );
   }
 
-  void _resetPI() {
+  @override
+  void resetPI() {
     setState(() {
-      _initializeProbabilities(
+      initializeProbabilities(
           /*
 
  0   0   0    1459/2000
@@ -630,13 +548,14 @@ class _LFI1ScreenState extends State<LFI1Screen> {
 
           );
 
-      _calculateAndDisplayProbabilities();
+      calculateAndDisplayProbabilities();
     });
   }
 
-  void _resetBCT() {
+  @override
+  void resetBCT() {
     setState(() {});
-    _initializeProbabilities(
+    initializeProbabilities(
       /*
 0: 835
 2: 125
@@ -676,11 +595,12 @@ class _LFI1ScreenState extends State<LFI1Screen> {
         // 26: [(669, 5120)],
       },
     );
-    _calculateAndDisplayProbabilities();
+    calculateAndDisplayProbabilities();
   }
 
-  void _resetRaven() {
-    _initializeProbabilities(initialMap: {
+  @override
+  void resetRaven() {
+    initializeProbabilities(initialMap: {
       0: [(1000, 2650)],
 
       ///  0   0  0
@@ -710,16 +630,17 @@ class _LFI1ScreenState extends State<LFI1Screen> {
       ///  1   1   1
     });
 
-    _calculateAndDisplayProbabilities();
+    calculateAndDisplayProbabilities();
     setState(() {});
   }
 
-  void _resetMiracle() {
+  @override
+  void resetMiracle() {
     // 0  0   6033/8192
     // 0  1      1/64
     // 1  0   1007/8192
     // 1  1      1/8
-    _initializeProbabilities(initialMap: {
+    initializeProbabilities(initialMap: {
       // 0  0   6033/8192
 
       0: [(6033, 8192)],
@@ -734,14 +655,15 @@ class _LFI1ScreenState extends State<LFI1Screen> {
       12: [(1024, 8192)],
     });
 
-    _calculateAndDisplayProbabilities();
+    calculateAndDisplayProbabilities();
     setState(() {});
   }
 
-  void _reset() {
+  @override
+  void reset() {
     setState(() {
-      _initializeProbabilities();
-      _calculateAndDisplayProbabilities();
+      initializeProbabilities();
+      calculateAndDisplayProbabilities();
     });
   }
 
@@ -768,7 +690,8 @@ class _LFI1ScreenState extends State<LFI1Screen> {
     );
   }
 
-  void _showText() {
+  @override
+  void showText() {
     var text = '';
 
     /// numNonZero is the number of _probValues[i].$1 != 0
@@ -846,6 +769,7 @@ class _LFI1ScreenState extends State<LFI1Screen> {
     );
   }
 
+  // ignore: unused_element
   void _showSumText() {
     /// Show the text in a dialog
     showDialog(

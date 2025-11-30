@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_math_fork/flutter_math.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:prob_lfi1/common_lib.dart';
 import 'package:prob_lfi1/fraction.dart';
 
@@ -67,9 +66,9 @@ enum LetKTV {
   }
 }
 
-/// for variables A, \neg A, B, \neg B, C, \neg C, there are 6*6*6 = 216 possibilities
+/// for variables A, B, and C, there are 6*6*6 = 216 possibilities
 final numLinesTruthTable = 216;
-final numCombTruthValues = 6; //  0 0, 0 1, 1 0, 1 1
+final numCombTruthValues = 6;
 
 class LetkPlusScreen extends StatefulWidget {
   const LetkPlusScreen({super.key});
@@ -78,7 +77,7 @@ class LetkPlusScreen extends StatefulWidget {
   State<LetkPlusScreen> createState() => _LetkPlusScreenState();
 }
 
-class _LetkPlusScreenState extends State<LetkPlusScreen> {
+class _LetkPlusScreenState extends State<LetkPlusScreen> implements ILogic {
   // --- State Variables ---
 
   // (b) probValues and related
@@ -90,7 +89,6 @@ class _LetkPlusScreenState extends State<LetkPlusScreen> {
   /// Truth variable table for the numLinesTruthTable probabilities
   /// Each sublist corresponds to a combination of A, B, C truth values
   late List<List<LetKTV>> _truthVariableTable;
-  String _selectedResetOption = 'Choose';
   // (c) Calculated results
   (int, int) _prA = (0, 1);
   (int, int) _prB = (0, 1);
@@ -132,14 +130,15 @@ class _LetkPlusScreenState extends State<LetkPlusScreen> {
   @override
   void initState() {
     super.initState();
-    _initializeProbabilities();
+    initializeProbabilities();
   }
 
   // --- Undo/Redo Logic ---
   // a circular buffer to store the last 10 changes
   final UndoRedoManager<List<String>> _undoRedoManager = UndoRedoManager();
 
-  void _undoLastChange() {
+  @override
+  void undoLastChange() {
     if (_undoRedoManager.canUndo()) {
       List<Object> objList = _undoRedoManager.undo() ?? _probValues;
       List<String> strList = objList.cast<String>();
@@ -155,8 +154,8 @@ class _LetkPlusScreenState extends State<LetkPlusScreen> {
         // A more robust solution might halt calculation or highlight fields.
       }
 
-      _initializeProbabilities(initialValues: _probValues);
-      _calculateAndDisplayProbabilities();
+      initializeProbabilities(initialValues: _probValues);
+      calculateAndDisplayProbabilities();
       setState(() {});
     } else {
       /// show a SnackBar if there is no undo available for 1 second
@@ -169,7 +168,8 @@ class _LetkPlusScreenState extends State<LetkPlusScreen> {
     }
   }
 
-  void _redoLastChange() {
+  @override
+  void redoLastChange() {
     if (_undoRedoManager.canRedo()) {
       List<Object> objList = _undoRedoManager.redo() ?? _probValues;
       List<String> strList = objList.cast<String>();
@@ -181,8 +181,8 @@ class _LetkPlusScreenState extends State<LetkPlusScreen> {
         // A more robust solution might halt calculation or highlight fields.
       }
 
-      _initializeProbabilities(initialValues: _probValues);
-      _calculateAndDisplayProbabilities();
+      initializeProbabilities(initialValues: _probValues);
+      calculateAndDisplayProbabilities();
       setState(() {});
     } else {
       /// show a SnackBar if there is no redo available for 1 second
@@ -200,7 +200,7 @@ class _LetkPlusScreenState extends State<LetkPlusScreen> {
   //     {List<(int, int)>? initialValues,
   //     Map<int, List<(int, int)>>? initialMap}) {
 
-  void _initializeProbabilities(
+  void initializeProbabilities(
       {List<(int, int)>? initialValues,
       Map<int, (int, int)>? initialMap,
       Map<(LetKTV, LetKTV, LetKTV), (int, int)>? initialTruthMap}) {
@@ -308,7 +308,8 @@ class _LetkPlusScreenState extends State<LetkPlusScreen> {
   }
 
   // --- Calculation Logic ---
-  void _calculateAndDisplayProbabilities() {
+  @override
+  void calculateAndDisplayProbabilities() {
     // put in the undo/redo manager
 
     // 1. Parse all TextField values and store them in _probValues
@@ -668,83 +669,7 @@ class _LetkPlusScreenState extends State<LetkPlusScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Wrap(
-            spacing: 10.0,
-            runSpacing: 10.0,
-            children: [
-              ElevatedButton(
-                onPressed: _undoLastChange,
-                child: Icon(Icons.undo_outlined, size: 20),
-              ),
-              ElevatedButton(
-                onPressed: _redoLastChange,
-                child: Icon(Icons.redo_outlined, size: 20),
-              ),
-              ElevatedButton(
-                onPressed: _calculateAndDisplayProbabilities,
-                child: SelText('Calculate'),
-              ),
-
-              SizedBox(width: 8), // Space between buttons
-              ElevatedButton(
-                onPressed: () {
-                  _showText();
-                },
-                child: SelText('Text'),
-              ),
-              DropdownButtonHideUnderline(
-                child: Container(
-                  padding: EdgeInsets.fromLTRB(12, 3, 12, 5),
-
-                  /// a rounded border to the DropdownButton
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: const Color.fromARGB(
-                          255, 96, 139, 109), // Border color
-                      width: 1, // Border width
-                    ),
-                    color: const Color.fromARGB(
-                        255, 215, 234, 238), // Same as ElevatedButton default
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: DropdownButton<String>(
-                    value: _selectedResetOption,
-                    isDense: true,
-                    icon: const Icon(Icons.arrow_drop_down,
-                        size: 25), // Reset icon
-                    hint: SelText(_selectedResetOption),
-                    onChanged: (String? newValue) {
-                      if (newValue == null) return;
-                      setState(() {
-                        _selectedResetOption = newValue;
-                        switch (newValue) {
-                          case 'Reset':
-                            _reset();
-                            break;
-                          case 'Prob. Independency':
-                            _resetPI();
-                            break;
-                          case 'Bayes Confirm.':
-                            _resetBCT();
-                            break;
-                          // case 'Bayes Confirm. Corpus':
-                          //   _resetBCTCorpus();
-                          //   break;
-                          case 'Raven':
-                            _resetRaven();
-                            break;
-                          case 'Miracle':
-                            _resetMiracle();
-                            break;
-                        }
-                      });
-                    },
-                    items: ddMenuItemList,
-                  ),
-                ),
-              ),
-            ],
-          ),
+          wrapToButtons(this, _prSum),
           const SizedBox(height: 15),
           Expanded(
               child: table(
@@ -778,9 +703,10 @@ class _LetkPlusScreenState extends State<LetkPlusScreen> {
     );
   }
 
-  void _resetBCT() {
+  @override
+  void resetBCT() {
     setState(() {});
-    _initializeProbabilities(
+    initializeProbabilities(
       initialTruthMap: {
         /*
  0   0   0     835/5120
@@ -801,12 +727,13 @@ class _LetkPlusScreenState extends State<LetkPlusScreen> {
         (LetKTV.b, LetKTV.b, LetKTV.b): (796, 5120),
       },
     );
-    _calculateAndDisplayProbabilities();
+    calculateAndDisplayProbabilities();
   }
 
-  void _resetPI() {
+  @override
+  void resetPI() {
     setState(() {
-      _initializeProbabilities(initialTruthMap: {
+      initializeProbabilities(initialTruthMap: {
         /*
 21: 0 1 0 1 0 1 : 1459/2000
 23: 0 1 0 1 1 1 :  161/2000
@@ -853,12 +780,13 @@ class _LetkPlusScreenState extends State<LetkPlusScreen> {
         */
       });
 
-      _calculateAndDisplayProbabilities();
+      calculateAndDisplayProbabilities();
     });
   }
 
-  void _resetRaven() {
-    _initializeProbabilities(initialTruthMap: {
+  @override
+  void resetRaven() {
+    initializeProbabilities(initialTruthMap: {
       /*
           0: (1128, 2560),      // 0   0   0    1128/2560
           1: (51, 2560),        // 0   0   1      51/2560
@@ -888,31 +816,32 @@ class _LetkPlusScreenState extends State<LetkPlusScreen> {
       // (LetKTV.t0, LetKTV.t0, LetKTV.t0): (125, 2560),
     });
 
-    _calculateAndDisplayProbabilities();
+    calculateAndDisplayProbabilities();
     setState(() {});
   }
 
-  void _resetMiracle() {
+  @override
+  void resetMiracle() {
     // 0  0   8192/8192
     // 0  1      1/64
     // 1  0   1007/8192
     // 1  1      1/8
-    _initializeProbabilities(initialTruthMap: {
+    initializeProbabilities(initialTruthMap: {
       (LetKTV.f0, LetKTV.f0, LetKTV.f0): (6033, 8192),
       (LetKTV.f0, LetKTV.b, LetKTV.f0): (128, 8192),
       (LetKTV.b, LetKTV.f0, LetKTV.f0): (1007, 8192),
       (LetKTV.b, LetKTV.b, LetKTV.f0): (1024, 8192),
     });
 
-    _calculateAndDisplayProbabilities();
+    calculateAndDisplayProbabilities();
     setState(() {});
   }
 
-  void _reset() {
-    setState(() {
-      _initializeProbabilities();
-      _calculateAndDisplayProbabilities();
-    });
+  @override
+  void reset() {
+    initializeProbabilities();
+    calculateAndDisplayProbabilities();
+    setState(() {});
   }
 
   @override
@@ -941,221 +870,9 @@ class _LetkPlusScreenState extends State<LetkPlusScreen> {
     );
   }
 
-  void _showText() {
-    var text = r'\begin{align*}' '\n';
-    String intToTruthValue(int i) {
-      switch (i) {
-        case 0:
-          return '0, 0';
-        case 1:
-          return '0, 1';
-        case 2:
-          return '1, 0';
-        case 3:
-          return '1, 1';
-        default:
-          return '';
-      }
-    }
-
-    int size = _probValues.length;
-    var k = 0;
-    for (int aA = 0; aA < numCombTruthValues; aA++) {
-      for (int bB = 0; bB < numCombTruthValues; bB++) {
-        for (int cC = 0; cC < numCombTruthValues; cC++) {
-          /// \rule{0pt}{3ex}$(0, 0, 0)$ &
-          if (_probValues[k].$1 != 0) {
-            var frac = _textControllers[k].text;
-            text +=
-                's_{$k} &= (${intToTruthValue(aA)}, ${intToTruthValue(bB)}, ${intToTruthValue(cC)}) & Pr(s_{$k}) = $frac ${k < size - 1 ? '\\\\[0.2cm] ' : ''}\n';
-          }
-          k++;
-        }
-      }
-    }
-
-    text += r'\end{align*}' '\n';
-
-    String denom = '';
-
-    /// found the first _probValues with a non-zero denominator and assing the corresponding
-    /// _textControllers text to denom
-    for (int i = 0; i < _probValues.length; i++) {
-      if (_probValues[i].$2 != 0) {
-        denom = _textControllers[i].text.split('/')[1];
-        break;
-      }
-    }
-
-    text += r'\begin{align*}' '\n';
-    text += r'Pr(A) &= \frac{' +
-        _prANumeratorSum +
-        r'}{' +
-        denom +
-        r'} &= ' '${(_prA.$1 * 1.0 / _prA.$2).toStringAsFixed(5)}\\\\' '\n';
-    text += r'Pr(B) &= \frac{' +
-        _prBNumeratorSum +
-        r'}{' +
-        denom +
-        r'} &= ' '${(_prB.$1 * 1.0 / _prB.$2).toStringAsFixed(5)}\\\\' '\n';
-    text += r'Pr(C) &= \frac{' +
-        _prCNumeratorSum +
-        r'}{' +
-        denom +
-        r'} &= ' '${(_prC.$1 * 1.0 / _prC.$2).toStringAsFixed(5)}\\\\' '\n';
-    text += r'Pr(A \land B) &= \frac{' +
-        _prABNumeratorSum +
-        r'}{' +
-        denom +
-        r'} &= ' '${(_prAB.$1 * 1.0 / _prAB.$2).toStringAsFixed(5)}\\\\' '\n';
-    text += r'Pr(A \land C) &= \frac{' +
-        _prACNumeratorSum +
-        r'}{' +
-        denom +
-        r'} &= ' '${(_prAC.$1 * 1.0 / _prAC.$2).toStringAsFixed(5)}\\\\' '\n';
-    text += r'Pr(B \land C) &= \frac{' +
-        _prBCNumeratorSum +
-        r'}{' +
-        denom +
-        r'} &= ' '${(_prBC.$1 * 1.0 / _prBC.$2).toStringAsFixed(5)}\\\\' '\n';
-    text += r'Pr(A \land B \land C) &= \frac{' +
-        _prABCNumeratorSum +
-        r'}{' +
-        denom +
-        r'} \\\\' '\n';
-    text += r'Pr(\neg A) &= \frac{' +
-        _prNotANumeratorSum +
-        r'}{' +
-        denom +
-        r'} &= '
-            '${(_prNotA.$1 * 1.0 / _prNotA.$2).toStringAsFixed(5)}\\\\'
-            '\n';
-    text += r'Pr(\neg B) &= \frac{' +
-        _prNotBNumeratorSum +
-        r'}{' +
-        denom +
-        r'} &= '
-            '${(_prNotB.$1 * 1.0 / _prNotB.$2).toStringAsFixed(5)}\\\\'
-            '\n';
-    text += r'Pr(C \land \neg A) &= \frac{' +
-        _prCNotANumeratorSum +
-        r'}{' +
-        denom +
-        r'} &= '
-            '${(_prCNotA.$1 * 1.0 / _prCNotA.$2).toStringAsFixed(5)}\\\\'
-            '\n';
-    text += r'Pr(C \land \neg B) &= \frac{' +
-        _prCNotBNumeratorSum +
-        r'}{' +
-        denom +
-        r'} &= '
-            '${(_prCNotB.$1 * 1.0 / _prCNotB.$2).toStringAsFixed(5)}\\\\'
-            '\n';
-    text += r'Pr(\Sigma) &= \frac{' +
-        _prSum.$1.toString() +
-        r'}{' +
-        _prSum.$2.toString() +
-        r'} &= ' '${(_prSum.$1 * 1.0 / _prSum.$2).toStringAsFixed(5)}\\\\' '\n';
-
-    text += r'Pr(A)Pr(B) &= \frac{' +
-        (_prA.$1 * _prB.$1).toString() +
-        r'}{' +
-        (_prA.$2 * _prB.$2).toString() +
-        r'} & = '
-            '${((_prA.$1 * 1.0 * _prB.$1) / (_prA.$2 * _prB.$2)).toStringAsFixed(5)}\\\\'
-            '\n';
-    text += r'Pr(A)Pr(C) &= \frac{' +
-        (_prA.$1 * _prC.$1).toString() +
-        r'}{' +
-        (_prA.$2 * _prC.$2).toString() +
-        r'} & = '
-            '${((_prA.$1 * 1.0 * _prC.$1) / (_prA.$2 * _prC.$2)).toStringAsFixed(5)}\\\\'
-            '\n';
-    text += r'Pr(B)Pr(C) &= \frac{' +
-        (_prB.$1 * _prC.$1).toString() +
-        r'}{' +
-        (_prB.$2 * _prC.$2).toString() +
-        r'} & = '
-            '${((_prB.$1 * 1.0 * _prC.$1) / (_prB.$2 * _prC.$2)).toStringAsFixed(5)}\\\\'
-            '\n';
-    text += r'Pr(A)Pr(B)Pr(C) &= \frac{' +
-        (_prA.$1 * _prB.$1 * _prC.$1).toString() +
-        r'}{' +
-        (_prA.$2 * _prB.$2 * _prC.$2).toString() +
-        r'} & = '
-            '${((_prA.$1 * 1.0 * _prB.$1 * 1.0 * _prC.$1) / (_prA.$2 * _prB.$2 * _prC.$2)).toStringAsFixed(5)}\\\\'
-            '\n';
-    var prCgivenA = div(_prAC, _prA);
-    var prCgivenB = div(_prBC, _prB);
-    var sCA = sub(div(_prAC, _prA), div(_prCNotA, _prNotA));
-    var sCB = sub(div(_prBC, _prB), div(_prCNotB, _prNotB));
-
-    text += r'Pr(C|A) &= \frac{' +
-        (_prAC.$1 * _prA.$2).toString() +
-        r'}{' +
-        (_prA.$1 * _prAC.$2).toString() +
-        r'} & = '
-            '${(prCgivenA.$1 * 1.0 / prCgivenA.$2).toStringAsFixed(5)}\\\\'
-            '\n';
-    text += r'Pr(C|B) &= \frac{' +
-        (_prBC.$1 * _prB.$2).toString() +
-        r'}{' +
-        (_prB.$1 * _prBC.$2).toString() +
-        r'} & = '
-            '${(prCgivenB.$1 * 1.0 / prCgivenB.$2).toStringAsFixed(5)}\\\\'
-            '\n';
-    text += r'Pr(C \land \neg A) &= \frac{' +
-        _prCNotA.$1.toString() +
-        r'}{' +
-        _prCNotA.$2.toString() +
-        r'} & = '
-            '${(_prCNotA.$1 * 1.0 / _prCNotA.$2).toStringAsFixed(5)}\\\\'
-            '\n';
-    text += r'Pr(C \land \neg B) &= \frac{' +
-        _prCNotB.$1.toString() +
-        r'}{' +
-        _prCNotB.$2.toString() +
-        r'} & = '
-            '${(_prCNotB.$1 * 1.0 / _prCNotB.$2).toStringAsFixed(5)}\\\\'
-            '\n';
-    text += r's(C, A) &= \frac{' +
-        sCA.$1.toString() +
-        r'}{' +
-        sCA.$2.toString() +
-        r'} & = ' '${(sCA.$1 * 1.0 / sCA.$2).toStringAsFixed(5)}\\\\' '\n';
-    text += r's(C, B) &= \frac{' +
-        sCB.$1.toString() +
-        r'}{' +
-        sCB.$2.toString() +
-        r'} & = ' '${(sCB.$1 * 1.0 / sCB.$2).toStringAsFixed(5)}\\\\' '\n';
-
-    var prAplusNotA = addFractions(_prNotA, _prA);
-    text += r'Pr(\neg A) + Pr(A) &= \frac{' +
-        _prNotA.$1.toString() +
-        r'}{' +
-        _prNotA.$2.toString() +
-        r'} + \frac{' +
-        _prA.$1.toString() +
-        r'}{' +
-        _prA.$2.toString() +
-        r'}  & = '
-            '${(prAplusNotA.$1 * 1.0 / prAplusNotA.$2).toStringAsFixed(5)}\\\\'
-            '\n';
-    var prBplusNotB = addFractions(_prNotB, _prB);
-    text += r'Pr(\neg B) + Pr(B) &= \frac{' +
-        _prNotB.$1.toString() +
-        r'}{' +
-        _prNotB.$2.toString() +
-        r'} + \frac{' +
-        _prB.$1.toString() +
-        r'}{' +
-        _prB.$2.toString() +
-        r'}   & = '
-            '${(prBplusNotB.$1 * 1.0 / prBplusNotB.$2).toStringAsFixed(5)}\\\\'
-            '\n';
-    text += r'\end{align*}' '\n';
-
-    text += '\n\n\\begin{comment}' + octaveStr + '\n\\end{comment}';
+  @override
+  void showText() {
+    String text = 'No text to show';
 
     /// Show the text in a dialog
     showDialog(
@@ -1191,3 +908,4 @@ class _LetkPlusScreenState extends State<LetkPlusScreen> {
     );
   }
 }
+
