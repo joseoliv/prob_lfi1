@@ -731,7 +731,7 @@ class _ClassicalScreenState extends State<ClassicalScreen> implements ILogic {
   }
 
   @override
-  void resetBCT() {
+  Future<void> resetBCT() async {
     setState(() {});
     initializeProbabilities(initialMap: {
       /*
@@ -769,7 +769,7 @@ class _ClassicalScreenState extends State<ClassicalScreen> implements ILogic {
   }
 
   @override
-  void resetPI() {
+  Future<void> resetPI() async {
     setState(() {
       initializeProbabilities(initialMap: {
         /*
@@ -790,7 +790,7 @@ class _ClassicalScreenState extends State<ClassicalScreen> implements ILogic {
   }
 
   @override
-  void resetRaven() {
+  Future<void> resetRaven() async {
     initializeProbabilities(
         /*
 
@@ -831,7 +831,7 @@ class _ClassicalScreenState extends State<ClassicalScreen> implements ILogic {
   }
 
   @override
-  void resetMiracle() {
+  Future<void> resetMiracle() async {
     // 0  0   6033/8192
     // 0  1      1/64
     // 1  0   1007/8192
@@ -856,7 +856,7 @@ class _ClassicalScreenState extends State<ClassicalScreen> implements ILogic {
   }
 
   @override
-  void reset() {
+  Future<void> reset() async {
     setState(() {
       initializeProbabilities();
       calculateAndDisplayProbabilities();

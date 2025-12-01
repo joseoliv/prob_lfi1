@@ -458,39 +458,58 @@ class _LFI1ScreenState extends State<LFI1Screen> implements ILogic {
           wrapToButtons(this, _prSum),
           const SizedBox(height: 15),
           Expanded(
-              child: table(
-            prA: _prA,
-            prB: _prB,
-            prC: _prC,
-            prAB: _prAB,
-            prAC: _prAC,
-            prBC: _prBC,
-            prABC: _prABC,
-            prCNotA: _prCNotA,
-            prCNotB: _prCNotB,
-            prNotA: _prNotA,
-            prNotB: _prNotB,
-            prNotC: _prNotC,
-            prANotC: _prANotC,
-            prBNotC: _prBNotC,
-            prCNotAandB: _prCNotAandB,
-            prNotAB: _prNotAB,
-            prANotB: _prANotB,
-            prCNotAB: _prCNotAB,
-            prCNotBA: _prCNotBA,
-            prNotAandB: _prNotAandB,
-            prANotBNotC: _prANotBNotC,
-            prNotBNotC: _prNotBNotC,
-            prABNotC: _prABNotC,
-            prSum: _prSum,
-          )),
+              child: FutureBuilder<Widget>(future: () async {
+            return table(
+              prA: _prA,
+              prB: _prB,
+              prC: _prC,
+              prAB: _prAB,
+              prAC: _prAC,
+              prBC: _prBC,
+              prABC: _prABC,
+              prCNotA: _prCNotA,
+              prCNotB: _prCNotB,
+              prNotA: _prNotA,
+              prNotB: _prNotB,
+              prNotC: _prNotC,
+              prANotC: _prANotC,
+              prBNotC: _prBNotC,
+              prCNotAandB: _prCNotAandB,
+              prNotAB: _prNotAB,
+              prANotB: _prANotB,
+              prCNotAB: _prCNotAB,
+              prCNotBA: _prCNotBA,
+              prNotAandB: _prNotAandB,
+              prANotBNotC: _prANotBNotC,
+              prNotBNotC: _prNotBNotC,
+              prABNotC: _prABNotC,
+              prSum: _prSum,
+            );
+          }(), builder: (context, asyncSnapshot) {
+            if (asyncSnapshot.connectionState == ConnectionState.waiting) {
+              return Center(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.5,
+                  height: MediaQuery.of(context).size.width * 0.5,
+                  child: const CircularProgressIndicator(
+                    strokeWidth: 8.0,
+                  ),
+                ),
+              );
+            } else if (asyncSnapshot.hasError) {
+              return Center(
+                  child: SelText('Error: ${asyncSnapshot.error.toString()}'));
+            } else {
+              return asyncSnapshot.data ?? SelText('No data');
+            }
+          })),
         ],
       ),
     );
   }
 
   @override
-  void resetPI() {
+  Future<void> resetPI() async {
     setState(() {
       initializeProbabilities(
           /*
@@ -515,45 +534,14 @@ class _LFI1ScreenState extends State<LFI1Screen> implements ILogic {
             10: [(19, 2000)],
             12: [(19, 2000)],
             13: [(1, 2000)],
-          }
-          //   initialValues: [
-          //   (1459, 2000),
-          //   (150, 2000),
-          //   (11, 2000),
-          //   (101, 2000),
-          //   (0, 1),
-          //   (0, 1),
-          //   (60, 2000),
-          //   (0, 1),
-          //   (19, 2000),
-          //   (101, 2000),
-          //   (0, 1),
-          //   (0, 1),
-          //   (0, 1),
-          //   (0, 1),
-          //   (0, 1),
-          //   (0, 1),
-          //   (0, 1),
-          //   (0, 1),
-          //   (60, 2000),
-          //   (0, 1),
-          //   (19, 2000),
-          //   (0, 1),
-          //   (0, 1),
-          //   (0, 1),
-          //   (19, 2000),
-          //   (0, 1),
-          //   (1, 2000)
-          // ]
-
-          );
+          });
 
       calculateAndDisplayProbabilities();
     });
   }
 
   @override
-  void resetBCT() {
+  Future<void> resetBCT() async {
     setState(() {});
     initializeProbabilities(
       /*
@@ -599,7 +587,7 @@ class _LFI1ScreenState extends State<LFI1Screen> implements ILogic {
   }
 
   @override
-  void resetRaven() {
+  Future<void> resetRaven() async {
     initializeProbabilities(initialMap: {
       0: [(1000, 2650)],
 
@@ -635,7 +623,7 @@ class _LFI1ScreenState extends State<LFI1Screen> implements ILogic {
   }
 
   @override
-  void resetMiracle() {
+  Future<void> resetMiracle() async {
     // 0  0   6033/8192
     // 0  1      1/64
     // 1  0   1007/8192
@@ -660,7 +648,7 @@ class _LFI1ScreenState extends State<LFI1Screen> implements ILogic {
   }
 
   @override
-  void reset() {
+  Future<void> reset() async {
     setState(() {
       initializeProbabilities();
       calculateAndDisplayProbabilities();

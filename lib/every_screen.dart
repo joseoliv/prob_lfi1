@@ -16,7 +16,7 @@ class EveryScreen extends StatefulWidget {
   State<EveryScreen> createState() => _EveryScreenState();
 }
 
-class _EveryScreenState extends State<EveryScreen> implements ILogic{
+class _EveryScreenState extends State<EveryScreen> implements ILogic {
   // --- State Variables ---
 
   // (b) probValues and related
@@ -559,7 +559,7 @@ class _EveryScreenState extends State<EveryScreen> implements ILogic{
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          wrapToButtons(this,_prSum),
+          wrapToButtons(this, _prSum),
           const SizedBox(height: 15),
           Expanded(
               child: table(
@@ -594,7 +594,7 @@ class _EveryScreenState extends State<EveryScreen> implements ILogic{
   }
 
   @override
-  void resetBCT() {
+  Future<void> resetBCT() async {
     setState(() {});
     initializeProbabilities(
       initialMap: {
@@ -612,27 +612,23 @@ class _EveryScreenState extends State<EveryScreen> implements ILogic{
     calculateAndDisplayProbabilities();
   }
 
-@override
-  void resetRaven() {
+  @override
+  Future<void> resetRaven() async {
     setState(() {});
     initializeProbabilities(
-      initialMap: {
-      },
+      initialMap: {},
     );
     calculateAndDisplayProbabilities();
   }
 
-
-@override
-  void resetMiracle() {
+  @override
+  Future<void> resetMiracle() async {
     setState(() {});
     initializeProbabilities(
-      initialMap: {
-      },
+      initialMap: {},
     );
     calculateAndDisplayProbabilities();
   }
-
 
   // void _resetBCTCorpus() {
   //   setState(() {});
@@ -654,7 +650,7 @@ class _EveryScreenState extends State<EveryScreen> implements ILogic{
   // }
 
   @override
-  void resetPI() {
+  Future<void> resetPI() async {
     setState(() {
       initializeProbabilities(initialMap: {
         /*
@@ -687,7 +683,7 @@ class _EveryScreenState extends State<EveryScreen> implements ILogic{
   }
 
   @override
-  void reset() {
+  Future<void> reset() async {
     setState(() {
       initializeProbabilities();
       calculateAndDisplayProbabilities();

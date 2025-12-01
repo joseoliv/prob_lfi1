@@ -704,7 +704,7 @@ class _LetkPlusScreenState extends State<LetkPlusScreen> implements ILogic {
   }
 
   @override
-  void resetBCT() {
+  Future<void> resetBCT() async {
     setState(() {});
     initializeProbabilities(
       initialTruthMap: {
@@ -731,7 +731,24 @@ class _LetkPlusScreenState extends State<LetkPlusScreen> implements ILogic {
   }
 
   @override
-  void resetPI() {
+  Future<void> resetPI() async {
+    setState(() {
+      initializeProbabilities(initialTruthMap: {
+        (LetKTV.f0, LetKTV.f0, LetKTV.f0): (1459, 2000),
+        (LetKTV.f0, LetKTV.f0, LetKTV.b): (161, 2000),
+        (LetKTV.f0, LetKTV.b, LetKTV.f0): (161, 2000),
+        (LetKTV.f0, LetKTV.b, LetKTV.b): (19, 2000),
+        (LetKTV.b, LetKTV.f0, LetKTV.f0): (161, 2000),
+        (LetKTV.b, LetKTV.f0, LetKTV.b): (19, 2000),
+        (LetKTV.b, LetKTV.b, LetKTV.f0): (19, 2000),
+        (LetKTV.b, LetKTV.b, LetKTV.b): (1, 2000),
+      });
+      calculateAndDisplayProbabilities();
+    });
+  }
+
+  @override
+  Future<void> reset() async {
     setState(() {
       initializeProbabilities(initialTruthMap: {
         /*
@@ -785,7 +802,7 @@ class _LetkPlusScreenState extends State<LetkPlusScreen> implements ILogic {
   }
 
   @override
-  void resetRaven() {
+  Future<void> resetRaven() async {
     initializeProbabilities(initialTruthMap: {
       /*
           0: (1128, 2560),      // 0   0   0    1128/2560
@@ -821,8 +838,8 @@ class _LetkPlusScreenState extends State<LetkPlusScreen> implements ILogic {
   }
 
   @override
-  void resetMiracle() {
-    // 0  0   8192/8192
+  Future<void> resetMiracle() async {
+    // 0  0   6033/8192
     // 0  1      1/64
     // 1  0   1007/8192
     // 1  1      1/8
@@ -833,13 +850,6 @@ class _LetkPlusScreenState extends State<LetkPlusScreen> implements ILogic {
       (LetKTV.b, LetKTV.b, LetKTV.f0): (1024, 8192),
     });
 
-    calculateAndDisplayProbabilities();
-    setState(() {});
-  }
-
-  @override
-  void reset() {
-    initializeProbabilities();
     calculateAndDisplayProbabilities();
     setState(() {});
   }
@@ -908,4 +918,3 @@ class _LetkPlusScreenState extends State<LetkPlusScreen> implements ILogic {
     );
   }
 }
-

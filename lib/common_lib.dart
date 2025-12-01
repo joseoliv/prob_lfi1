@@ -959,21 +959,28 @@ abstract interface class ILogic {
   void redoLastChange();
   void calculateAndDisplayProbabilities();
   void showText();
-  void reset();
-  void resetPI();
-  void resetBCT();
-  void resetRaven();
-  void resetMiracle();
+  Future<void> reset();
+  Future<void> resetPI();
+  Future<void> resetBCT();
+  Future<void> resetRaven();
+  Future<void> resetMiracle();
   void setState(VoidCallback fn);
 }
 
 String selectedResetOption = 'Reset';
 
-Widget wrapToButtons(ILogic aLogic, (int, int) prSum) {
+Widget wrapToButtons(ILogic aLogic, (int, int) prSum,
+    {bool isLoading = false}) {
   return Wrap(
     spacing: 10.0,
     runSpacing: 10.0,
     children: [
+      if (isLoading)
+        SizedBox(
+          width: 30,
+          height: 30,
+          child: CircularProgressIndicator(strokeWidth: 3.0),
+        ),
       ElevatedButton(
         onPressed: aLogic.undoLastChange,
         child: Icon(Icons.undo_outlined, size: 20),
@@ -1013,10 +1020,15 @@ Widget wrapToButtons(ILogic aLogic, (int, int) prSum) {
             isDense: true,
             icon: const Icon(Icons.arrow_drop_down, size: 25), // Reset icon
             hint: SelText(selectedResetOption),
-            onChanged: (String? newValue) {
+            onChanged: (String? newValue) async {
               if (newValue == null) return;
+
               aLogic.setState(() {
                 selectedResetOption = newValue;
+              });
+
+              // Execute async operations
+              try {
                 switch (newValue) {
                   case 'Reset':
                     aLogic.reset();
@@ -1034,8 +1046,11 @@ Widget wrapToButtons(ILogic aLogic, (int, int) prSum) {
                     aLogic.resetMiracle();
                     break;
                 }
-                selectedResetOption = 'Reset';
-              });
+              } finally {
+                aLogic.setState(() {
+                  selectedResetOption = 'Reset';
+                });
+              }
             },
             items: ddMenuItemList,
           ),

@@ -533,7 +533,7 @@ class _CiScreenState extends State<CiScreen> implements ILogic {
   }
 
   @override
-  void resetBCT() {
+  Future<void> resetBCT() async {
     setState(() {});
     initializeProbabilities(
       initialMap: {
@@ -581,7 +581,7 @@ class _CiScreenState extends State<CiScreen> implements ILogic {
   }
 
   @override
-  void resetPI() {
+  Future<void> resetPI() async {
     setState(() {
       initializeProbabilities(initialValues: [
         (1459, 2000),
@@ -618,7 +618,7 @@ class _CiScreenState extends State<CiScreen> implements ILogic {
   }
 
   @override
-  void resetRaven() {
+  Future<void> resetRaven() async {
     setState(() {
       initializeProbabilities(
         initialMap: {
@@ -656,7 +656,7 @@ class _CiScreenState extends State<CiScreen> implements ILogic {
   }
 
   @override
-  void resetMiracle() {
+  Future<void> resetMiracle() async {
     // 0  0   6033/8192
     // 0  1      1/64
     // 1  0   1007/8192
@@ -673,7 +673,7 @@ class _CiScreenState extends State<CiScreen> implements ILogic {
       18: [(1007, 8192)],
 
       // 1  1      1/8
-      26: [(1024, 8192)],
+      12: [(1024, 8192)],
     });
 
     calculateAndDisplayProbabilities();
@@ -725,7 +725,7 @@ class _CiScreenState extends State<CiScreen> implements ILogic {
   */
 
   @override
-  void reset() {
+  Future<void> reset() async {
     setState(() {
       initializeProbabilities();
       calculateAndDisplayProbabilities();
