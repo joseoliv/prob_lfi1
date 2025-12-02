@@ -825,15 +825,15 @@ class _LetkPlusScreenState extends State<LetkPlusScreen> implements ILogic {
           6: (30, 2560),        // 1   1   0      30/2560
           7: (125, 2560),       // 1   1   1     125/2560
       */
-      (LetKTV.f0, LetKTV.f0, LetKTV.f0): (1000, 2560),
-      (LetKTV.f0, LetKTV.f0, LetKTV.b): (88, 2560),
-      (LetKTV.b, LetKTV.f0, LetKTV.f0): (181, 2560),
-      (LetKTV.b, LetKTV.f0, LetKTV.b): (0, 2560),
-      (LetKTV.f0, LetKTV.b, LetKTV.f0): (36, 2560),
-      (LetKTV.f0, LetKTV.b, LetKTV.b): (138, 2560),
-      (LetKTV.b, LetKTV.b, LetKTV.f0): (52, 2560),
-      (LetKTV.b, LetKTV.b, LetKTV.b): (215, 2560),
-      (LetKTV.t, LetKTV.t, LetKTV.t): (940, 2560),
+      (LetKTV.f0, LetKTV.f0, LetKTV.f0): (1000, 2650),
+      (LetKTV.f0, LetKTV.f0, LetKTV.b): (88, 2650),
+      (LetKTV.b, LetKTV.f0, LetKTV.f0): (181, 2650),
+      (LetKTV.b, LetKTV.f0, LetKTV.b): (0, 2650),
+      (LetKTV.f0, LetKTV.b, LetKTV.f0): (36, 2650),
+      (LetKTV.f0, LetKTV.b, LetKTV.b): (138, 2650),
+      (LetKTV.b, LetKTV.b, LetKTV.f0): (52, 2650),
+      (LetKTV.b, LetKTV.b, LetKTV.b): (215, 2650),
+      (LetKTV.t, LetKTV.t, LetKTV.t): (940, 2650),
 
       // (LetKTV.f0, LetKTV.f0, LetKTV.f0): (1128, 2560),
       // (LetKTV.f0, LetKTV.f0, LetKTV.b): (51, 2560),
