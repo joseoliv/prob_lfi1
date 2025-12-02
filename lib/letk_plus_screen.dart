@@ -78,6 +78,7 @@ class LetkPlusScreen extends StatefulWidget {
 }
 
 class _LetkPlusScreenState extends State<LetkPlusScreen> implements ILogic {
+  bool _isLoading = false;
   // --- State Variables ---
 
   // (b) probValues and related
@@ -98,6 +99,15 @@ class _LetkPlusScreenState extends State<LetkPlusScreen> implements ILogic {
   (int, int) _prBC = (0, 1);
   (int, int) _prABC = (0, 1);
   (int, int) _prSum = (0, 1);
+  @override
+  bool get isLoading => _isLoading;
+  @override
+  set isLoading(bool value) {
+    setState(() {
+      _isLoading = value;
+    });
+  }
+
   (int, int) _prNotA = (0, 1);
   (int, int) _prNotB = (0, 1);
   (int, int) _prNotC = (0, 1);
@@ -669,7 +679,7 @@ class _LetkPlusScreenState extends State<LetkPlusScreen> implements ILogic {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          wrapToButtons(this, _prSum),
+          wrapToButtons(this, _prSum, isLoading: _isLoading),
           const SizedBox(height: 15),
           Expanded(
               child: table(
@@ -732,6 +742,7 @@ class _LetkPlusScreenState extends State<LetkPlusScreen> implements ILogic {
 
   @override
   Future<void> resetPI() async {
+    await Future.delayed(const Duration(seconds: 2));
     setState(() {
       initializeProbabilities(initialTruthMap: {
         (LetKTV.f0, LetKTV.f0, LetKTV.f0): (1459, 2000),
@@ -814,23 +825,24 @@ class _LetkPlusScreenState extends State<LetkPlusScreen> implements ILogic {
           6: (30, 2560),        // 1   1   0      30/2560
           7: (125, 2560),       // 1   1   1     125/2560
       */
-      (LetKTV.f0, LetKTV.f0, LetKTV.f0): (1128, 2560),
-      (LetKTV.f0, LetKTV.f0, LetKTV.b): (51, 2560),
-      (LetKTV.b, LetKTV.f0, LetKTV.f0): (1125, 2560),
+      (LetKTV.f0, LetKTV.f0, LetKTV.f0): (1000, 2560),
+      (LetKTV.f0, LetKTV.f0, LetKTV.b): (88, 2560),
+      (LetKTV.b, LetKTV.f0, LetKTV.f0): (181, 2560),
       (LetKTV.b, LetKTV.f0, LetKTV.b): (0, 2560),
-      (LetKTV.f0, LetKTV.b, LetKTV.f0): (21, 2560),
-      (LetKTV.f0, LetKTV.b, LetKTV.b): (80, 2560),
-      (LetKTV.b, LetKTV.b, LetKTV.f0): (30, 2560),
-      (LetKTV.b, LetKTV.b, LetKTV.b): (125, 2560),
+      (LetKTV.f0, LetKTV.b, LetKTV.f0): (36, 2560),
+      (LetKTV.f0, LetKTV.b, LetKTV.b): (138, 2560),
+      (LetKTV.b, LetKTV.b, LetKTV.f0): (52, 2560),
+      (LetKTV.b, LetKTV.b, LetKTV.b): (215, 2560),
+      (LetKTV.t, LetKTV.t, LetKTV.t): (940, 2560),
 
       // (LetKTV.f0, LetKTV.f0, LetKTV.f0): (1128, 2560),
-      // (LetKTV.f0, LetKTV.f0, LetKTV.t0): (51, 2560),
-      // (LetKTV.t0, LetKTV.f0, LetKTV.f0): (1125, 2560),
-      // (LetKTV.t0, LetKTV.f0, LetKTV.t0): (0, 2560),
-      // (LetKTV.f0, LetKTV.t0, LetKTV.f0): (21, 2560),
-      // (LetKTV.f0, LetKTV.t0, LetKTV.t0): (80, 2560),
-      // (LetKTV.t0, LetKTV.t0, LetKTV.f0): (30, 2560),
-      // (LetKTV.t0, LetKTV.t0, LetKTV.t0): (125, 2560),
+      // (LetKTV.f0, LetKTV.f0, LetKTV.b): (51, 2560),
+      // (LetKTV.b, LetKTV.f0, LetKTV.f0): (1125, 2560),
+      // (LetKTV.b, LetKTV.f0, LetKTV.b): (0, 2560),
+      // (LetKTV.f0, LetKTV.b, LetKTV.f0): (21, 2560),
+      // (LetKTV.f0, LetKTV.b, LetKTV.b): (80, 2560),
+      // (LetKTV.b, LetKTV.b, LetKTV.f0): (30, 2560),
+      // (LetKTV.b, LetKTV.b, LetKTV.b): (125, 2560),
     });
 
     calculateAndDisplayProbabilities();
@@ -863,6 +875,13 @@ class _LetkPlusScreenState extends State<LetkPlusScreen> implements ILogic {
           Math.tex('LET^+_K')
         ]),
         backgroundColor: const Color.fromARGB(255, 225, 244, 252),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            selectedResetOption = 'Reset';
+            Navigator.of(context).pop();
+          },
+        ),
       ),
       body: Row(
         children: [

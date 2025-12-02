@@ -17,6 +17,7 @@ class EveryScreen extends StatefulWidget {
 }
 
 class _EveryScreenState extends State<EveryScreen> implements ILogic {
+  bool _isLoading = false;
   // --- State Variables ---
 
   // (b) probValues and related
@@ -37,6 +38,15 @@ class _EveryScreenState extends State<EveryScreen> implements ILogic {
   (int, int) _prBC = (0, 1);
   (int, int) _prABC = (0, 1);
   (int, int) _prSum = (0, 1);
+  @override
+  bool get isLoading => _isLoading;
+  @override
+  set isLoading(bool value) {
+    setState(() {
+      _isLoading = value;
+    });
+  }
+
   (int, int) _prNotA = (0, 1);
   (int, int) _prNotB = (0, 1);
   (int, int) _prNotC = (0, 1);
@@ -559,7 +569,7 @@ class _EveryScreenState extends State<EveryScreen> implements ILogic {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          wrapToButtons(this, _prSum),
+          wrapToButtons(this, _prSum, isLoading: _isLoading),
           const SizedBox(height: 15),
           Expanded(
               child: table(
@@ -616,7 +626,64 @@ class _EveryScreenState extends State<EveryScreen> implements ILogic {
   Future<void> resetRaven() async {
     setState(() {});
     initializeProbabilities(
-      initialMap: {},
+      initialMap: {
+        ///  0   0  0
+        21: (1000, 2650),
+
+        ///  0   0 1/2
+        22: (88, 2650),
+
+        ///  0  1/2  0
+        25: (36, 2650),
+
+        ///  0  1/2 1/2   011010
+        26: (138, 2650),
+
+        ///  1   1   1    101010
+        42: (940, 2650),
+
+        /// 1/2  0   0    100101
+        37: (181, 2650),
+
+        /// 1/2  0  1/2   100110
+        38: (0, 2650),
+
+        /// 1/2 1/2  0     101001
+        41: (52, 2650),
+
+        /// 1/2 1/2 1/2
+        63: (215, 2650),
+
+        /*
+        ///  0   0  0
+        21: (1000, 2650),
+
+        ///  0   0 1/2
+        23: (88, 2650),
+
+        ///  0  1/2  0
+        29: (36, 2650),
+
+        ///  0  1/2 1/2
+        31: (138, 2650),
+
+        ///  1   1   1
+        42: (940, 2650),
+
+        /// 1/2  0   0
+        53: (181, 2650),
+
+        /// 1/2  0  1/2
+        55: (0, 2650),
+
+        /// 1/2 1/2  0
+        61: (52, 2650),
+
+        /// 1/2 1/2 1/2
+        63: (215, 2650),
+
+        */
+      },
     );
     calculateAndDisplayProbabilities();
   }
@@ -625,7 +692,20 @@ class _EveryScreenState extends State<EveryScreen> implements ILogic {
   Future<void> resetMiracle() async {
     setState(() {});
     initializeProbabilities(
-      initialMap: {},
+      initialMap: {
+        // 0  0   6033/8192
+
+        21: (6033, 8192),
+
+        // 0  1      1/64
+        29: (128, 8192),
+
+        // 1  0   1007/8192
+        52: (1007, 8192),
+
+        // 1  1      1/8
+        60: (1024, 8192),
+      },
     );
     calculateAndDisplayProbabilities();
   }
@@ -651,6 +731,7 @@ class _EveryScreenState extends State<EveryScreen> implements ILogic {
 
   @override
   Future<void> resetPI() async {
+    await Future.delayed(const Duration(seconds: 2));
     setState(() {
       initializeProbabilities(initialMap: {
         /*
@@ -696,6 +777,13 @@ class _EveryScreenState extends State<EveryScreen> implements ILogic {
       appBar: AppBar(
         title: const SelText('Probability Calculator for 4V (maybe FDE)'),
         backgroundColor: Colors.blueGrey[100],
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            selectedResetOption = 'Reset';
+            Navigator.of(context).pop();
+          },
+        ),
       ),
       body: Row(
         children: [

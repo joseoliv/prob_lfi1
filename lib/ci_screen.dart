@@ -14,6 +14,7 @@ class CiScreen extends StatefulWidget {
 
 class _CiScreenState extends State<CiScreen> implements ILogic {
   // --- State Variables ---
+  bool _isLoading = false;
 
   // (b) probValues and related
   late List<TextEditingController> _textControllers;
@@ -48,6 +49,14 @@ class _CiScreenState extends State<CiScreen> implements ILogic {
   (int, int) _prANotBNotC = (0, 1);
   (int, int) _prNotBNotC = (0, 1);
   (int, int) _prABNotC = (0, 1);
+  @override
+  bool get isLoading => _isLoading;
+  @override
+  set isLoading(bool value) {
+    setState(() {
+      _isLoading = value;
+    });
+  }
 
   String _prANumeratorSum = '';
   String _prBNumeratorSum = '';
@@ -498,7 +507,7 @@ class _CiScreenState extends State<CiScreen> implements ILogic {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          wrapToButtons(this, _prSum),
+          wrapToButtons(this, _prSum, isLoading: _isLoading),
           const SizedBox(height: 15),
           Expanded(
               child: table(
@@ -582,6 +591,7 @@ class _CiScreenState extends State<CiScreen> implements ILogic {
 
   @override
   Future<void> resetPI() async {
+    await Future.delayed(const Duration(seconds: 2));
     setState(() {
       initializeProbabilities(initialValues: [
         (1459, 2000),
@@ -661,6 +671,7 @@ class _CiScreenState extends State<CiScreen> implements ILogic {
     // 0  1      1/64
     // 1  0   1007/8192
     // 1  1      1/8
+
     initializeProbabilities(initialMap: {
       // 0  0   6033/8192
 
@@ -673,7 +684,7 @@ class _CiScreenState extends State<CiScreen> implements ILogic {
       18: [(1007, 8192)],
 
       // 1  1      1/8
-      12: [(1024, 8192)],
+      24: [(1024, 8192)],
     });
 
     calculateAndDisplayProbabilities();
@@ -738,6 +749,13 @@ class _CiScreenState extends State<CiScreen> implements ILogic {
       appBar: AppBar(
         title: const SelText('Probability Calculator for Ci'),
         backgroundColor: Colors.blueGrey[100],
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            selectedResetOption = 'Reset';
+            Navigator.of(context).pop();
+          },
+        ),
       ),
       body: Row(
         children: [

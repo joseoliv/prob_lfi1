@@ -16,6 +16,7 @@ class LFI1Screen extends StatefulWidget {
 }
 
 class _LFI1ScreenState extends State<LFI1Screen> implements ILogic {
+  bool _isLoading = false;
   // --- State Variables ---
 
   // (b) probValues and related
@@ -48,6 +49,14 @@ class _LFI1ScreenState extends State<LFI1Screen> implements ILogic {
   (int, int) _prANotBNotC = (0, 1);
   (int, int) _prNotBNotC = (0, 1);
   (int, int) _prABNotC = (0, 1);
+  @override
+  bool get isLoading => _isLoading;
+  @override
+  set isLoading(bool value) {
+    setState(() {
+      _isLoading = value;
+    });
+  }
 
   /// text of the form
   /// A : (0, 0, 0) : 1459/2000
@@ -455,7 +464,7 @@ class _LFI1ScreenState extends State<LFI1Screen> implements ILogic {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          wrapToButtons(this, _prSum),
+          wrapToButtons(this, _prSum, isLoading: _isLoading),
           const SizedBox(height: 15),
           Expanded(
               child: FutureBuilder<Widget>(future: () async {
@@ -510,6 +519,7 @@ class _LFI1ScreenState extends State<LFI1Screen> implements ILogic {
 
   @override
   Future<void> resetPI() async {
+    await Future.delayed(const Duration(seconds: 2));
     setState(() {
       initializeProbabilities(
           /*
@@ -589,33 +599,33 @@ class _LFI1ScreenState extends State<LFI1Screen> implements ILogic {
   @override
   Future<void> resetRaven() async {
     initializeProbabilities(initialMap: {
+      ///  0   0  0
       0: [(1000, 2650)],
 
-      ///  0   0  0
+      ///  0   0 1/2
       1: [(88, 2650)],
 
-      ///  0   0 1/2
+      ///  0  1/2  0
       3: [(36, 2650)],
 
-      ///  0  1/2  0
+      ///  0  1/2 1/2
       4: [(138, 2650)],
 
-      ///  0  1/2 1/2
+      /// 1/2  0   0
       9: [(181, 2650)],
 
-      /// 1/2  0   0
+      /// 1/2  0  1/2
       10: [(0, 2650)],
 
-      /// 1/2  0  1/2
+      /// 1/2 1/2  0
       12: [(52, 2650)],
 
-      /// 1/2 1/2  0
+      /// 1/2 1/2 1/2
       13: [(215, 2650)],
 
-      /// 1/2 1/2 1/2
+      ///  1   1   1
       26: [(940, 2650)],
 
-      ///  1   1   1
     });
 
     calculateAndDisplayProbabilities();
@@ -661,6 +671,13 @@ class _LFI1ScreenState extends State<LFI1Screen> implements ILogic {
       appBar: AppBar(
         title: const SelText('Probability Calculator for LFI1'),
         backgroundColor: Colors.blueGrey[100],
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            selectedResetOption = 'Reset';
+            Navigator.of(context).pop();
+          },
+        ),
       ),
       body: Row(
         children: [

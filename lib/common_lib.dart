@@ -26,7 +26,9 @@ Widget _buildResultRow(String label, (int, int) value) {
         SizedBox(
           width: 140,
           child: SelText(label,
-              style: const TextStyle(fontWeight: FontWeight.bold)),
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+              )),
         ),
         const SizedBox(width: 10),
         SelText(
@@ -104,6 +106,11 @@ Widget table(
   var prAgivenB = div(prAB, prB);
   var prBgivenA = div(prAB, prA);
   var prAgivenNotB = div(prANotB, prNotB);
+
+  var prAprC = (prA.$1 * prC.$1, prA.$2 * prC.$2);
+  var prAprB = (prA.$1 * prB.$1, prA.$2 * prB.$2);
+  var prBprC = (prB.$1 * prC.$1, prB.$2 * prC.$2);
+  var prAprBprC = (prA.$1 * prB.$1 * prC.$1, prA.$2 * prB.$2 * prC.$2);
 
   // 'Pr(A) < 1/2'
   var lotteryAndMiraclesOne = lt(prA, (1, 2));
@@ -251,14 +258,20 @@ Widget table(
                   ]),
                   TableRow(children: [
                     TableCell(
-                      child: Padding(
+                      child: Container(
                           padding: inSetCell,
+                          color: gt(prAPlusNotA, (1, 1))
+                              ? Colors.orangeAccent
+                              : null,
                           child:
                               _buildResultRow('Pr(~A)+Pr(A) = ', prAPlusNotA)),
                     ),
                     TableCell(
-                      child: Padding(
+                      child: Container(
                           padding: inSetCell,
+                          color: gt(prBPlusNotB, (1, 1))
+                              ? Colors.orangeAccent
+                              : null,
                           child:
                               _buildResultRow('Pr(~B)+Pr(B) = ', prBPlusNotB)),
                     )
@@ -266,8 +279,11 @@ Widget table(
 
                   TableRow(children: [
                     TableCell(
-                      child: Padding(
+                      child: Container(
                           padding: inSetCell,
+                          color: gt(prCPlusNotC, (1, 1))
+                              ? Colors.orangeAccent
+                              : null,
                           child:
                               _buildResultRow('Pr(C)+Pr(~C) = ', prCPlusNotC)),
                     ),
@@ -282,7 +298,7 @@ Widget table(
                             padding: inSetCell,
                             color: Colors.lightBlueAccent,
                             child: SelText(
-                              'Probability Independence',
+                              'Probability Independence (boolean expressions must be true) ',
                               style: textStyle,
                             ))),
                     TableCell(
@@ -301,8 +317,7 @@ Widget table(
                     TableCell(
                       child: Padding(
                           padding: inSetCell,
-                          child: _buildResultRow('Pr(A)Pr(B) = ',
-                              (prA.$1 * prB.$1, prA.$2 * prB.$2))),
+                          child: _buildResultRow('Pr(A)Pr(B) = ', prAprB)),
                     ),
                   ]),
                   TableRow(children: [
@@ -313,8 +328,7 @@ Widget table(
                     TableCell(
                         child: Padding(
                             padding: inSetCell,
-                            child: _buildResultRow('Pr(A)Pr(C) = ',
-                                (prA.$1 * prC.$1, prA.$2 * prC.$2)))),
+                            child: _buildResultRow('Pr(A)Pr(C) = ', prAprC))),
                   ]),
                   TableRow(children: [
                     TableCell(
@@ -324,8 +338,7 @@ Widget table(
                     TableCell(
                       child: Padding(
                           padding: inSetCell,
-                          child: _buildResultRow('Pr(B)Pr(C) = ',
-                              (prB.$1 * prC.$1, prB.$2 * prC.$2))),
+                          child: _buildResultRow('Pr(B)Pr(C) = ', prBprC)),
                     ),
                   ]),
                   TableRow(children: [
@@ -336,10 +349,35 @@ Widget table(
                     TableCell(
                         child: Padding(
                             padding: inSetCell,
-                            child: _buildResultRow('Pr(A)Pr(B)Pr(C) = ', (
-                              prA.$1 * prB.$1 * prC.$1,
-                              prA.$2 * prB.$2 * prC.$2
-                            )))),
+                            child: _buildResultRow(
+                                'Pr(A)Pr(B)Pr(C) = ', prAprBprC))),
+                  ]),
+
+                  TableRow(children: [
+                    TableCell(
+                        child: Padding(
+                            padding: inSetCell,
+                            child: _buildResultRowStr('Pr(A&B) =  Pr(A)Pr(B)',
+                                eq(prAB, prAprB) ? 'True' : 'False'))),
+                    TableCell(
+                        child: Padding(
+                            padding: inSetCell,
+                            child: _buildResultRowStr('Pr(A&C) = Pr(A)Pr(C)',
+                                eq(prAC, prAprC) ? 'True' : 'False'))),
+                  ]),
+
+                  TableRow(children: [
+                    TableCell(
+                        child: Padding(
+                            padding: inSetCell,
+                            child: _buildResultRowStr('Pr(B&C) =  Pr(B)Pr(C)',
+                                eq(prBC, prBprC) ? 'True' : 'False'))),
+                    TableCell(
+                        child: Padding(
+                            padding: inSetCell,
+                            child: _buildResultRowStr(
+                                'Pr(A&B&C) ≠ Pr(A)Pr(B)Pr(C)',
+                                !eq(prABC, prAprBprC) ? 'True' : 'False'))),
                   ]),
 
                   TableRow(children: [
@@ -348,7 +386,7 @@ Widget table(
                             padding: inSetCell,
                             color: Colors.lightBlueAccent,
                             child: SelText(
-                                'Bayesian Confirmation Theory (inequalities must be true)  ',
+                                'Bayesian Confirmation Theory (boolean expressions must be true)  ',
                                 style: textStyle))),
                     TableCell(
                       child: Container(
@@ -505,7 +543,7 @@ Widget table(
                             padding: inSetCell,
                             color: Colors.lightBlueAccent,
                             child: SelText(
-                              'Raven (inequalities must be true)',
+                              'Raven (boolean expressions must be true)',
                               style: textStyle,
                             ))),
                     TableCell(
@@ -636,7 +674,7 @@ Widget table(
                             padding: inSetCell,
                             color: Colors.lightBlueAccent,
                             child: SelText(
-                              'Lottery of Miracles (inequalities must be true)',
+                              'Lottery of Miracles (boolean expressions must be true)',
                               style: textStyle,
                             ))),
                     const TableCell(child: SizedBox.shrink()),
@@ -965,6 +1003,8 @@ abstract interface class ILogic {
   Future<void> resetRaven();
   Future<void> resetMiracle();
   void setState(VoidCallback fn);
+  bool get isLoading;
+  set isLoading(bool value);
 }
 
 String selectedResetOption = 'Reset';
@@ -977,9 +1017,12 @@ Widget wrapToButtons(ILogic aLogic, (int, int) prSum,
     children: [
       if (isLoading)
         SizedBox(
-          width: 30,
-          height: 30,
-          child: CircularProgressIndicator(strokeWidth: 3.0),
+          width: 100,
+          height: 100,
+          child: CircularProgressIndicator(
+            strokeWidth: 4.0,
+            color: Colors.blue,
+          ),
         ),
       ElevatedButton(
         onPressed: aLogic.undoLastChange,
@@ -1022,34 +1065,33 @@ Widget wrapToButtons(ILogic aLogic, (int, int) prSum,
             hint: SelText(selectedResetOption),
             onChanged: (String? newValue) async {
               if (newValue == null) return;
+              selectedResetOption = newValue;
 
-              aLogic.setState(() {
-                selectedResetOption = newValue;
-              });
+              aLogic.setState(() {});
 
-              // Execute async operations
+              // Set loading state and execute async operations
+              aLogic.isLoading = true;
               try {
                 switch (newValue) {
                   case 'Reset':
-                    aLogic.reset();
+                    await aLogic.reset();
                     break;
                   case 'Prob. Independency':
-                    aLogic.resetPI();
+                    await aLogic.resetPI();
                     break;
                   case 'Bayes Confirm.':
-                    aLogic.resetBCT();
+                    await aLogic.resetBCT();
                     break;
                   case 'Raven':
-                    aLogic.resetRaven();
+                    await aLogic.resetRaven();
                     break;
                   case 'Miracle':
-                    aLogic.resetMiracle();
+                    await aLogic.resetMiracle();
                     break;
                 }
               } finally {
-                aLogic.setState(() {
-                  selectedResetOption = 'Reset';
-                });
+                aLogic.isLoading = false;
+                aLogic.setState(() {});
               }
             },
             items: ddMenuItemList,

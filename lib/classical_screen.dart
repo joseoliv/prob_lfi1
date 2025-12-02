@@ -17,6 +17,7 @@ class ClassicalScreen extends StatefulWidget {
 }
 
 class _ClassicalScreenState extends State<ClassicalScreen> implements ILogic {
+  bool _isLoading = false;
   // --- State Variables ---
 
   // (b) probValues and related
@@ -37,6 +38,15 @@ class _ClassicalScreenState extends State<ClassicalScreen> implements ILogic {
   (int, int) _prBC = (0, 1);
   (int, int) _prABC = (0, 1);
   (int, int) _prSum = (0, 1);
+  @override
+  bool get isLoading => _isLoading;
+  @override
+  set isLoading(bool value) {
+    setState(() {
+      _isLoading = value;
+    });
+  }
+
   (int, int) _prNotA = (0, 1);
   (int, int) _prNotB = (0, 1);
   (int, int) _prNotC = (0, 1);
@@ -695,7 +705,7 @@ class _ClassicalScreenState extends State<ClassicalScreen> implements ILogic {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          wrapToButtons(this, _prSum),
+          wrapToButtons(this, _prSum, isLoading: _isLoading),
           const SizedBox(height: 15),
           Expanded(child: Builder(builder: (context) {
             return table(
@@ -770,6 +780,7 @@ class _ClassicalScreenState extends State<ClassicalScreen> implements ILogic {
 
   @override
   Future<void> resetPI() async {
+    await Future.delayed(const Duration(seconds: 2));
     setState(() {
       initializeProbabilities(initialMap: {
         /*
@@ -867,6 +878,13 @@ class _ClassicalScreenState extends State<ClassicalScreen> implements ILogic {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            selectedResetOption = 'Reset';
+            Navigator.of(context).pop();
+          },
+        ),
         title: const SelText('Probability Calculator for a classical logic'),
         backgroundColor: const Color.fromARGB(255, 246, 221, 221),
       ),
