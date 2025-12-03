@@ -298,7 +298,7 @@ Widget table(
                             padding: inSetCell,
                             color: Colors.lightBlueAccent,
                             child: SelText(
-                              'Probability Independence (boolean expressions must be true) ',
+                              'Independence of Probability (boolean expressions must be true) ',
                               style: textStyle,
                             ))),
                     TableCell(
@@ -933,7 +933,7 @@ List<DropdownMenuItem<String>> ddMenuItemList = [
     ),
   ),
   DropdownMenuItem(
-    value: 'Prob. Independency',
+    value: 'Independence of Prob.',
     child: Row(
       children: [
         Transform.rotate(
@@ -944,7 +944,7 @@ List<DropdownMenuItem<String>> ddMenuItemList = [
           ),
         ),
         const SizedBox(width: 8),
-        const SelText('Prob. Independency'),
+        const SelText('Independence of Prob.'),
       ],
     ),
   ),
@@ -998,7 +998,7 @@ abstract interface class ILogic {
   void calculateAndDisplayProbabilities();
   void showText();
   Future<void> reset();
-  Future<void> resetPI();
+  Future<void> resetIP();
   Future<void> resetBCT();
   Future<void> resetRaven();
   Future<void> resetMiracle();
@@ -1076,8 +1076,8 @@ Widget wrapToButtons(ILogic aLogic, (int, int) prSum,
                   case 'Reset':
                     await aLogic.reset();
                     break;
-                  case 'Prob. Independency':
-                    await aLogic.resetPI();
+                  case 'Independence of Prob.':
+                    await aLogic.resetIP();
                     break;
                   case 'Bayes Confirm.':
                     await aLogic.resetBCT();

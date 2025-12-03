@@ -518,7 +518,7 @@ class _LFI1ScreenState extends State<LFI1Screen> implements ILogic {
   }
 
   @override
-  Future<void> resetPI() async {
+  Future<void> resetIP() async {
     await Future.delayed(const Duration(seconds: 2));
     setState(() {
       initializeProbabilities(
@@ -625,7 +625,6 @@ class _LFI1ScreenState extends State<LFI1Screen> implements ILogic {
 
       ///  1   1   1
       26: [(940, 2650)],
-
     });
 
     calculateAndDisplayProbabilities();

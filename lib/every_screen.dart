@@ -730,7 +730,7 @@ class _EveryScreenState extends State<EveryScreen> implements ILogic {
   // }
 
   @override
-  Future<void> resetPI() async {
+  Future<void> resetIP() async {
     await Future.delayed(const Duration(seconds: 2));
     setState(() {
       initializeProbabilities(initialMap: {
@@ -775,7 +775,8 @@ class _EveryScreenState extends State<EveryScreen> implements ILogic {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const SelText('Probability Calculator for 4V (maybe FDE)'),
+        title: const SelText(
+            'Probability Calculator for 4V (a logic with 4 truth values, like Belnap-Dunn)'),
         backgroundColor: Colors.blueGrey[100],
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),

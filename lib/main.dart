@@ -90,7 +90,7 @@ class MainMenuScreen extends StatelessWidget {
                   MaterialPageRoute(builder: (context) => const EveryScreen()),
                 );
               },
-              child: const Text('4V (maybe FDE)'),
+              child: const Text('4V'),
             ),
           ],
         ),

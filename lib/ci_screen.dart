@@ -590,7 +590,7 @@ class _CiScreenState extends State<CiScreen> implements ILogic {
   }
 
   @override
-  Future<void> resetPI() async {
+  Future<void> resetIP() async {
     await Future.delayed(const Duration(seconds: 2));
     setState(() {
       initializeProbabilities(initialValues: [
