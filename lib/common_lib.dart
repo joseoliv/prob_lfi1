@@ -674,7 +674,7 @@ Widget table(
                             padding: inSetCell,
                             color: Colors.lightBlueAccent,
                             child: SelText(
-                              'Lottery of Miracles (boolean expressions must be true)',
+                              'Lottery and Miracles (boolean expressions must be true)',
                               style: textStyle,
                             ))),
                     const TableCell(child: SizedBox.shrink()),

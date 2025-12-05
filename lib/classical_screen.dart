@@ -643,7 +643,7 @@ class _ClassicalScreenState extends State<ClassicalScreen> implements ILogic {
               height: 400,
               child: SelText(
                   'The Bayesian Confirmation Theory example shows just one of the results of the Fitelson article.'
-                  'The Lottery of Miracles example is just one of the two Fitelson examples.'))
+                  'The Lottery and Miracles example is just one of the two Fitelson examples.'))
         ],
       ),
     );
