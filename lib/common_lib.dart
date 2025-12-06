@@ -18,6 +18,96 @@ const Color barelyTea = Color(0xFFFAFAF5);
 const Color teaMist = Color(0xFFF9F7F4);
 const Color paleChai = Color(0xFFF4F0E8);
 
+enum LogicType { classical, lfi1, letplusK, ci, fourV }
+
+LogicType currentLogic = LogicType.classical;
+
+var helpTextLFI1 = '''
+A row in the left-hand side of this screen with 
+    Pr(a, b, c) 
+means a valuation v in which 
+    v(A) = a 
+    v(B) = b 
+    v(C) = c
+The rectangle to the right of Pr(a, b, c) is the probability of that valuation.
+Note that, with 3 truth values, 0, 1/2, and 1, there are 27 possible valuations.
+''';
+
+var helpTextLETplusK = '''
+A row in the left-hand side of this screen with 
+    Pr(abc) 
+means a valuation v in which 
+    v(A) = a 
+    v(B) = b 
+    v(C) = c
+The rectangle to the right of Pr(a, b, c) is the probability of that valuation.
+Note that, with 6 truth values, there are 216 possible valuations.
+The truth values are t, t0, b, n, f0, f
+''';
+
+var helpTextCi = '''
+A row in the left-hand side of this screen with 
+    Pr(a,â,e,ê,u,û) 
+means a valuation v in which 
+    v(A) = a 
+    v(~A) = â 
+    v(B) = e
+    v(~B) = ê
+    v(C) = u
+    v(~C) = û
+The rectangle to the right of Pr(a,â,e,ê,u,û) is the 
+probability of that valuation. Note that, with 
+2 truth values and three variables such that the 
+value of A and the value of ~A are independent, 
+there should be 2^6 = 64 possible valuations.
+But there are 27 because, whenever v(A) = 0, 
+then v(~A) = 1. But if v(A) = 1, v(~A) can be 
+either 0 or 1. 
+''';
+
+var helpText4V = '''
+A row in the left-hand side of this screen with 
+    Pr(aâeêuû) 
+means a valuation v in which 
+    v(A) = a 
+    v(~A) = â 
+    v(B) = e
+    v(~B) = ê
+    v(C) = u
+    v(~C) = û
+The rectangle to the right of Pr(aâeêuû) is the 
+probability of that valuation. Note that, with 
+2 truth values and three variables such that the 
+value of A and the value of ~A are independent, 
+there are 2^6 = 64 possible valuations.
+''';
+
+// 'Reset', 'Independence of Prob.', 'Bayes Confirm.', 'Raven', 'Miracle'
+enum ResetOptions {
+  reset,
+  independenceOfProbability,
+  bayesConfirmationTheory,
+  raven,
+  lotteryAndMiracles;
+
+  String get name {
+    switch (this) {
+      case ResetOptions.reset:
+        return 'Reset';
+      case ResetOptions.independenceOfProbability:
+        return 'Independence of Probability';
+      case ResetOptions.bayesConfirmationTheory:
+        return 'Bayes Confirmation Theory';
+      case ResetOptions.raven:
+        return 'Raven';
+      case ResetOptions.lotteryAndMiracles:
+        return 'Lotteries and Miracles';
+    }
+  }
+}
+
+ResetOptions selectedResetOption = ResetOptions.reset;
+
 Widget _buildResultRow(String label, (int, int) value) {
   return Padding(
     padding: const EdgeInsets.symmetric(vertical: 6.0),
@@ -276,7 +366,6 @@ Widget table(
                               _buildResultRow('Pr(~B)+Pr(B) = ', prBPlusNotB)),
                     )
                   ]),
-
                   TableRow(children: [
                     TableCell(
                       child: Container(
@@ -291,130 +380,130 @@ Widget table(
                       child: Padding(padding: inSetCell, child: Text('')),
                     )
                   ]),
-
-                  TableRow(children: [
-                    TableCell(
+                  if (selectedResetOption ==
+                      ResetOptions.independenceOfProbability) ...[
+                    TableRow(children: [
+                      TableCell(
+                          child: Container(
+                              padding: inSetCell,
+                              color: Colors.lightBlueAccent,
+                              child: SelText(
+                                'Independence of Probability (boolean expressions must be true) ',
+                                style: textStyle,
+                              ))),
+                      TableCell(
+                        child: Container(
+                            padding: inSetCell,
+                            color: Colors.lightBlueAccent,
+                            child: Text('')),
+                      ),
+                    ]),
+                    TableRow(children: [
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child: _buildResultRow('Pr(A & B) = ', prAB))),
+                      TableCell(
+                        child: Padding(
+                            padding: inSetCell,
+                            child: _buildResultRow('Pr(A)Pr(B) = ', prAprB)),
+                      ),
+                    ]),
+                    TableRow(children: [
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child: _buildResultRow('Pr(A & C) = ', prAC))),
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child: _buildResultRow('Pr(A)Pr(C) = ', prAprC))),
+                    ]),
+                    TableRow(children: [
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child: _buildResultRow('Pr(B & C) = ', prBC))),
+                      TableCell(
+                        child: Padding(
+                            padding: inSetCell,
+                            child: _buildResultRow('Pr(B)Pr(C) = ', prBprC)),
+                      ),
+                    ]),
+                    TableRow(children: [
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child:
+                                  _buildResultRow('Pr(A & B & C) = ', prABC))),
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child: _buildResultRow(
+                                  'Pr(A)Pr(B)Pr(C) = ', prAprBprC))),
+                    ]),
+                    TableRow(children: [
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child: _buildResultRowStr('Pr(A&B) =  Pr(A)Pr(B)',
+                                  eq(prAB, prAprB) ? 'True' : 'False'))),
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child: _buildResultRowStr('Pr(A&C) = Pr(A)Pr(C)',
+                                  eq(prAC, prAprC) ? 'True' : 'False'))),
+                    ]),
+                    TableRow(children: [
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child: _buildResultRowStr('Pr(B&C) =  Pr(B)Pr(C)',
+                                  eq(prBC, prBprC) ? 'True' : 'False'))),
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child: _buildResultRowStr(
+                                  'Pr(A&B&C) ≠ Pr(A)Pr(B)Pr(C)',
+                                  !eq(prABC, prAprBprC) ? 'True' : 'False'))),
+                    ]),
+                  ],
+                  if (selectedResetOption ==
+                      ResetOptions.bayesConfirmationTheory) ...[
+                    TableRow(children: [
+                      TableCell(
+                          child: Container(
+                              padding: inSetCell,
+                              color: Colors.lightBlueAccent,
+                              child: SelText(
+                                  'Bayesian Confirmation Theory (boolean expressions must be true)  ',
+                                  style: textStyle))),
+                      TableCell(
+                        child: Container(
+                            padding: inSetCell,
+                            color: Colors.lightBlueAccent,
+                            child: SelText('d(H, E) = Pr(H|E) - Pr(H)',
+                                style: textStyle)),
+                      ),
+                    ]),
+                    TableRow(children: [
+                      TableCell(
+                          child: Container(
+                              padding: inSetCell,
+                              color: Colors.lightBlueAccent,
+                              child: SelText('s(C, A) = Pr(C|A) - Pr(C|~A)',
+                                  style: textStyle))),
+                      TableCell(
                         child: Container(
                             padding: inSetCell,
                             color: Colors.lightBlueAccent,
                             child: SelText(
-                              'Independence of Probability (boolean expressions must be true) ',
-                              style: textStyle,
-                            ))),
-                    TableCell(
-                      child: Container(
-                          padding: inSetCell,
-                          color: Colors.lightBlueAccent,
-                          child: Text('')),
-                    ),
-                  ]),
+                                'i(C, A) = (Pr(A|C) - Pr(A|~C)) / (Pr(A|C) + Pr(A|~C))',
+                                style: textStyle)),
+                      ),
+                    ]),
 
-                  TableRow(children: [
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child: _buildResultRow('Pr(A & B) = ', prAB))),
-                    TableCell(
-                      child: Padding(
-                          padding: inSetCell,
-                          child: _buildResultRow('Pr(A)Pr(B) = ', prAprB)),
-                    ),
-                  ]),
-                  TableRow(children: [
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child: _buildResultRow('Pr(A & C) = ', prAC))),
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child: _buildResultRow('Pr(A)Pr(C) = ', prAprC))),
-                  ]),
-                  TableRow(children: [
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child: _buildResultRow('Pr(B & C) = ', prBC))),
-                    TableCell(
-                      child: Padding(
-                          padding: inSetCell,
-                          child: _buildResultRow('Pr(B)Pr(C) = ', prBprC)),
-                    ),
-                  ]),
-                  TableRow(children: [
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child: _buildResultRow('Pr(A & B & C) = ', prABC))),
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child: _buildResultRow(
-                                'Pr(A)Pr(B)Pr(C) = ', prAprBprC))),
-                  ]),
-
-                  TableRow(children: [
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child: _buildResultRowStr('Pr(A&B) =  Pr(A)Pr(B)',
-                                eq(prAB, prAprB) ? 'True' : 'False'))),
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child: _buildResultRowStr('Pr(A&C) = Pr(A)Pr(C)',
-                                eq(prAC, prAprC) ? 'True' : 'False'))),
-                  ]),
-
-                  TableRow(children: [
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child: _buildResultRowStr('Pr(B&C) =  Pr(B)Pr(C)',
-                                eq(prBC, prBprC) ? 'True' : 'False'))),
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child: _buildResultRowStr(
-                                'Pr(A&B&C) ≠ Pr(A)Pr(B)Pr(C)',
-                                !eq(prABC, prAprBprC) ? 'True' : 'False'))),
-                  ]),
-
-                  TableRow(children: [
-                    TableCell(
-                        child: Container(
-                            padding: inSetCell,
-                            color: Colors.lightBlueAccent,
-                            child: SelText(
-                                'Bayesian Confirmation Theory (boolean expressions must be true)  ',
-                                style: textStyle))),
-                    TableCell(
-                      child: Container(
-                          padding: inSetCell,
-                          color: Colors.lightBlueAccent,
-                          child: SelText('d(H, E) = Pr(H|E) - Pr(H)',
-                              style: textStyle)),
-                    ),
-                  ]),
-
-                  TableRow(children: [
-                    TableCell(
-                        child: Container(
-                            padding: inSetCell,
-                            color: Colors.lightBlueAccent,
-                            child: SelText('s(C, A) = Pr(C|A) - Pr(C|~A)',
-                                style: textStyle))),
-                    TableCell(
-                      child: Container(
-                          padding: inSetCell,
-                          color: Colors.lightBlueAccent,
-                          child: SelText(
-                              'i(C, A) = (Pr(A|C) - Pr(A|~C)) / (Pr(A|C) + Pr(A|~C))',
-                              style: textStyle)),
-                    ),
-                  ]),
-
-                  /*
+                    /*
                           SelText(
     's(C, A) = Pr(C|A) - Pr(C|~A)\n'
     'i(C, A) = (Pr(A|C) - Pr(A|~C)) / (Pr(A|C) + Pr(A|~C))\n',
@@ -424,301 +513,312 @@ Widget table(
         
                   */
 
-                  TableRow(children: [
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child: _buildResultRow('Pr(C|A) = ', prCgivenA))),
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child: _buildResultRow('Pr(C|B) = ', prCgivenB))),
-                  ]),
-                  TableRow(children: [
-                    TableCell(
-                        child: Padding(
-                            padding:
-                                inSetCell, // ${prCNotA.$1}/${prCNotA.$2} = ${(prCNotA.$1 * 1.0) / prCNotA.$2}
-                            child: _buildResultRow('Pr(C & ~A) = ', prCNotA))),
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child: _buildResultRow('Pr(C & ~B) = ', prCNotB))),
-                  ]),
-                  TableRow(children: [
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child:
-                                _buildResultRow('Pr(C|~A) = ', prCgivenNotA))),
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child:
-                                _buildResultRow('Pr(C|~B) = ', prCgivenNotB))),
-                  ]),
-                  TableRow(children: [
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child: _buildResultRow('Pr(A&~C) = ', prANotC))),
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child: _buildResultRow('Pr(B&~C) = ', prBNotC))),
-                  ]),
-                  TableRow(children: [
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child: _buildResultRow(
-                                'Pr(C&~(A&B)) = ', prCNotAandB))),
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child:
-                                _buildResultRow('Pr(~(A&B)) = ', prNotAandB))),
-                  ]),
-                  TableRow(children: [
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child: _buildResultRow('s(C, A) = ', sCA))),
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child: _buildResultRow('s(C, B) = ', sCB))),
-                  ]),
-                  TableRow(children: [
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child: _buildResultRow('i(C, A) = ', iCA))),
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child: _buildResultRow('i(C, B) = ', iCB))),
-                  ]),
-                  TableRow(children: [
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child: _buildResultRow('d(C, A) = ', dCA))),
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child: _buildResultRow('d(C, B) = ', dCB))),
-                  ]),
-                  TableRow(children: [
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child: _buildResultRowStr(
-                                'Pr(C|A) >= Pr(C|B)',
-                                (gt(div(prAC, prA), div(prBC, prB))
+                    TableRow(children: [
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child: _buildResultRow('Pr(C|A) = ', prCgivenA))),
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child: _buildResultRow('Pr(C|B) = ', prCgivenB))),
+                    ]),
+                    TableRow(children: [
+                      TableCell(
+                          child: Padding(
+                              padding:
+                                  inSetCell, // ${prCNotA.$1}/${prCNotA.$2} = ${(prCNotA.$1 * 1.0) / prCNotA.$2}
+                              child:
+                                  _buildResultRow('Pr(C & ~A) = ', prCNotA))),
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child:
+                                  _buildResultRow('Pr(C & ~B) = ', prCNotB))),
+                    ]),
+                    TableRow(children: [
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child: _buildResultRow(
+                                  'Pr(C|~A) = ', prCgivenNotA))),
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child: _buildResultRow(
+                                  'Pr(C|~B) = ', prCgivenNotB))),
+                    ]),
+                    TableRow(children: [
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child: _buildResultRow('Pr(A&~C) = ', prANotC))),
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child: _buildResultRow('Pr(B&~C) = ', prBNotC))),
+                    ]),
+                    TableRow(children: [
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child: _buildResultRow(
+                                  'Pr(C&~(A&B)) = ', prCNotAandB))),
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child: _buildResultRow(
+                                  'Pr(~(A&B)) = ', prNotAandB))),
+                    ]),
+                    TableRow(children: [
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child: _buildResultRow('s(C, A) = ', sCA))),
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child: _buildResultRow('s(C, B) = ', sCB))),
+                    ]),
+                    TableRow(children: [
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child: _buildResultRow('i(C, A) = ', iCA))),
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child: _buildResultRow('i(C, B) = ', iCB))),
+                    ]),
+                    TableRow(children: [
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child: _buildResultRow('d(C, A) = ', dCA))),
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child: _buildResultRow('d(C, B) = ', dCB))),
+                    ]),
+                    TableRow(children: [
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child: _buildResultRowStr(
+                                  'Pr(C|A) >= Pr(C|B)',
+                                  (gt(div(prAC, prA), div(prBC, prB))
+                                      ? 'True'
+                                      : 'False')))),
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child: _buildResultRowStr('s(C,A) < s(C,B)',
+                                  (lt(sCA, sCB) ? 'True' : 'False'))))
+                    ]),
+                    TableRow(children: [
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child: _buildResultRowStr('i(C,A) < i(C,B)',
+                                  (lt(iCA, iCB) ? 'True' : 'False')))),
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child: _buildResultRowStr('d(C, A) >= d(C, B) = ',
+                                  gt(dCA, dCB) ? 'True' : 'False'))),
+                    ]),
+                  ],
+                  if (selectedResetOption == ResetOptions.raven) ...[
+                    TableRow(children: [
+                      TableCell(
+                          child: Container(
+                              padding: inSetCell,
+                              color: Colors.lightBlueAccent,
+                              child: SelText(
+                                'Raven (boolean expressions must be true)',
+                                style: textStyle,
+                              ))),
+                      TableCell(
+                          child: Container(
+                              padding: inSetCell,
+                              color: Colors.lightBlueAccent,
+                              child: SelText(
+                                'Article uses H, B, R. We use A, B, C instead',
+                                style: textStyle,
+                              ))),
+                    ]),
+                    // _prABC == _prAC
+                    // _prNotB > _prC
+
+                    // _prAC/_prC
+                    // _prANotB
+                    TableRow(children: [
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child: _buildResultRow(
+                                  'Pr(A&C)/Pr(C) = ', div(prAC, prC)))),
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child: _buildResultRow('Pr(A&~B) = ', prANotB))),
+                    ]),
+                    // _prANotB/_prNotB
+                    // _prANotBNotC
+
+                    TableRow(children: [
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child: _buildResultRow(
+                                  'Pr(A&~B)/Pr(~B) = ', aNotBdivprNotB))),
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child: _buildResultRow(
+                                  'Pr(A&~B&~C) = ', prANotBNotC))),
+                    ]),
+
+                    // _prNotBNotC
+                    // _prANotBNotC/_prNotBNotC
+
+                    TableRow(children: [
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child:
+                                  _buildResultRow('Pr(~B&~C) = ', prNotBNotC))),
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child: _buildResultRow(
+                                  'Pr(A&~B&~C)/Pr(~B&~C)  = ',
+                                  aNotBNotCdivprNotBNotC))),
+                    ]),
+                    // _prABNotC/_prBNotC
+                    // _prABNotC/_prBNotC >= _prA
+
+                    TableRow(children: [
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child: _buildResultRow(
+                                  'Pr(A&B&~C)/Pr(B&~C)', aBNotCdivprBNotC))),
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child:
+                                  _buildResultRow('Pr(A&B&~C) = ', prABNotC))),
+                    ]),
+
+                    TableRow(children: [
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child: _buildResultRowStr(
+                                  '(1) Pr(A&B&C) == Pr(A&C)  = ',
+                                  (prABC == prAC) ? 'True' : 'False'))),
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child: _buildResultRowStr(
+                                '(2) Pr(Not B) > Pr(C) = ',
+                                (gt(sub(div(prNotB, prC), div(prBC, prB)),
+                                        (0, 1))
                                     ? 'True'
-                                    : 'False')))),
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child: _buildResultRowStr('s(C,A) < s(C,B)',
-                                (lt(sCA, sCB) ? 'True' : 'False'))))
-                  ]),
-                  TableRow(children: [
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child: _buildResultRowStr('i(C,A) < i(C,B)',
-                                (lt(iCA, iCB) ? 'True' : 'False')))),
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child: _buildResultRowStr('d(C, A) >= d(C, B) = ',
-                                gt(dCA, dCB) ? 'True' : 'False'))),
-                  ]),
+                                    : 'False'),
+                              ))),
+                    ]),
 
-                  TableRow(children: [
-                    TableCell(
-                        child: Container(
-                            padding: inSetCell,
-                            color: Colors.lightBlueAccent,
-                            child: SelText(
-                              'Raven (boolean expressions must be true)',
-                              style: textStyle,
-                            ))),
-                    TableCell(
-                        child: Container(
-                            padding: inSetCell,
-                            color: Colors.lightBlueAccent,
-                            child: SelText(
-                              'Article uses H, B, R. We use A, B, C instead',
-                              style: textStyle,
-                            ))),
-                  ]),
-                  // _prABC == _prAC
-                  // _prNotB > _prC
+                    TableRow(children: [
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child: _buildResultRowStr(
+                                  '(C) Pr(A|C) >= Pr(A|~B) = ',
+                                  ge(prAgivenC, aNotBdivprNotB)
+                                      ? 'True'
+                                      : 'False'))),
+                      TableCell(
+                        child: Padding(padding: inSetCell, child: Text('')),
+                      ),
+                    ]),
 
-                  // _prAC/_prC
-                  // _prANotB
-                  TableRow(children: [
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child: _buildResultRow(
-                                'Pr(A&C)/Pr(C) = ', div(prAC, prC)))),
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child: _buildResultRow('Pr(A&~B) = ', prANotB))),
-                  ]),
-                  // _prANotB/_prNotB
-                  // _prANotBNotC
+                    // _prANotBNotC/_prNotBNotC <= _prA
+                    // _prABNotC
+                    TableRow(children: [
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child: _buildResultRowStr(
+                                  '~(6) Pr(A&~B&~C)/Pr(~B&~C) <= Pr(A)',
+                                  le(aNotBNotCdivprNotBNotC, prA)
+                                      ? 'True'
+                                      : 'False'))),
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child: _buildResultRowStr(
+                                  '~(7) Pr(A&B&~C)/Pr(B&~C) >= Pr(A)',
+                                  ge(aBNotCdivprBNotC, prA)
+                                      ? 'True'
+                                      : 'False'))),
+                    ]),
+                  ],
+                  if (selectedResetOption ==
+                      ResetOptions.lotteryAndMiracles) ...[
+                    TableRow(children: [
+                      TableCell(
+                          child: Container(
+                              padding: inSetCell,
+                              color: Colors.lightBlueAccent,
+                              child: SelText(
+                                'Lottery and Miracles (boolean expressions must be true)',
+                                style: textStyle,
+                              ))),
+                      const TableCell(child: SizedBox.shrink()),
+                    ]),
+                    // _prABC == _prAC
+                    // _prNotB > _prC
 
-                  TableRow(children: [
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child: _buildResultRow(
-                                'Pr(A&~B)/Pr(~B) = ', aNotBdivprNotB))),
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child: _buildResultRow(
-                                'Pr(A&~B&~C) = ', prANotBNotC))),
-                  ]),
-
-                  // _prNotBNotC
-                  // _prANotBNotC/_prNotBNotC
-
-                  TableRow(children: [
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child:
-                                _buildResultRow('Pr(~B&~C) = ', prNotBNotC))),
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child: _buildResultRow('Pr(A&~B&~C)/Pr(~B&~C)  = ',
-                                aNotBNotCdivprNotBNotC))),
-                  ]),
-                  // _prABNotC/_prBNotC
-                  // _prABNotC/_prBNotC >= _prA
-
-                  TableRow(children: [
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child: _buildResultRow(
-                                'Pr(A&B&~C)/Pr(B&~C)', aBNotCdivprBNotC))),
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child: _buildResultRow('Pr(A&B&~C) = ', prABNotC))),
-                  ]),
-
-                  TableRow(children: [
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child: _buildResultRowStr(
-                                '(1) Pr(A&B&C) == Pr(A&C)  = ',
-                                (prABC == prAC) ? 'True' : 'False'))),
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child: _buildResultRowStr(
-                              '(2) Pr(Not B) > Pr(C) = ',
-                              (gt(sub(div(prNotB, prC), div(prBC, prB)), (0, 1))
-                                  ? 'True'
-                                  : 'False'),
-                            ))),
-                  ]),
-
-                  TableRow(children: [
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child: _buildResultRowStr(
-                                '(C) Pr(A|C) >= Pr(A|~B) = ',
-                                ge(prAgivenC, aNotBdivprNotB)
-                                    ? 'True'
-                                    : 'False'))),
-                    TableCell(
-                      child: Padding(padding: inSetCell, child: Text('')),
-                    ),
-                  ]),
-
-                  // _prANotBNotC/_prNotBNotC <= _prA
-                  // _prABNotC
-                  TableRow(children: [
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child: _buildResultRowStr(
-                                '~(6) Pr(A&~B&~C)/Pr(~B&~C) <= Pr(A)',
-                                le(aNotBNotCdivprNotBNotC, prA)
-                                    ? 'True'
-                                    : 'False'))),
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child: _buildResultRowStr(
-                                '~(7) Pr(A&B&~C)/Pr(B&~C) >= Pr(A)',
-                                ge(aBNotCdivprBNotC, prA) ? 'True' : 'False'))),
-                  ]),
-
-                  TableRow(children: [
-                    TableCell(
-                        child: Container(
-                            padding: inSetCell,
-                            color: Colors.lightBlueAccent,
-                            child: SelText(
-                              'Lottery and Miracles (boolean expressions must be true)',
-                              style: textStyle,
-                            ))),
-                    const TableCell(child: SizedBox.shrink()),
-                  ]),
-                  // _prABC == _prAC
-                  // _prNotB > _prC
-
-                  TableRow(children: [
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child: _buildResultRowStr('Pr(A) < 1/2',
-                                lotteryAndMiraclesOne ? 'True' : 'False'))),
-                    TableCell(
-                        child: Padding(
-                      padding: inSetCell,
-                      child: _buildResultRowStr('Pr(A|B) > 1/2 ',
-                          lotteryAndMiraclesTwo ? 'True' : 'False'),
-                    )),
-                  ]),
-                  TableRow(children: [
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child: _buildResultRowStr('Pr(B|A) > 1/2 ',
-                                lotteryAndMiraclesThree ? 'True' : 'False'))),
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child: _buildResultRowStr(
-                              'Pr(A|~B) >= Pr(B)',
-                              lotteryAndMiraclesFour ? 'True' : 'False',
-                            ))),
-                  ]),
-                  TableRow(children: [
-                    TableCell(
-                        child: Padding(
-                            padding: inSetCell,
-                            child: _buildResultRowStr(
-                                'Pr(A|B) - Pr(A|~B) <= Pr(~B) - Pr(B)',
-                                lotteryAndMiraclesFive ? 'True' : 'False'))),
-                    TableCell(
-                        child: Padding(padding: inSetCell, child: Text(''))),
-                  ]),
+                    TableRow(children: [
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child: _buildResultRowStr('Pr(A) < 1/2',
+                                  lotteryAndMiraclesOne ? 'True' : 'False'))),
+                      TableCell(
+                          child: Padding(
+                        padding: inSetCell,
+                        child: _buildResultRowStr('Pr(A|B) > 1/2 ',
+                            lotteryAndMiraclesTwo ? 'True' : 'False'),
+                      )),
+                    ]),
+                    TableRow(children: [
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child: _buildResultRowStr('Pr(B|A) > 1/2 ',
+                                  lotteryAndMiraclesThree ? 'True' : 'False'))),
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child: _buildResultRowStr(
+                                'Pr(A|~B) >= Pr(B)',
+                                lotteryAndMiraclesFour ? 'True' : 'False',
+                              ))),
+                    ]),
+                    TableRow(children: [
+                      TableCell(
+                          child: Padding(
+                              padding: inSetCell,
+                              child: _buildResultRowStr(
+                                  'Pr(A|B) - Pr(A|~B) <= Pr(~B) - Pr(B)',
+                                  lotteryAndMiraclesFive ? 'True' : 'False'))),
+                      TableCell(
+                          child: Padding(padding: inSetCell, child: Text(''))),
+                    ]),
+                  ],
                 ],
               ),
             ),
@@ -921,19 +1021,19 @@ double _parseFraction(String fraction) {
   }
 }
 
-List<DropdownMenuItem<String>> ddMenuItemList = [
+List<DropdownMenuItem<ResetOptions>> ddMenuItemList = [
   DropdownMenuItem(
-    value: 'Reset',
+    value: ResetOptions.reset,
     child: Row(
-      children: const [
+      children: [
         Icon(Icons.restart_alt, size: 20),
         SizedBox(width: 8),
-        SelText('Reset'),
+        SelText(ResetOptions.reset.name),
       ],
     ),
   ),
   DropdownMenuItem(
-    value: 'Independence of Prob.',
+    value: ResetOptions.independenceOfProbability,
     child: Row(
       children: [
         Transform.rotate(
@@ -944,12 +1044,12 @@ List<DropdownMenuItem<String>> ddMenuItemList = [
           ),
         ),
         const SizedBox(width: 8),
-        const SelText('Independence of Prob.'),
+        SelText(ResetOptions.independenceOfProbability.name),
       ],
     ),
   ),
   DropdownMenuItem(
-    value: 'Bayes Confirm.',
+    value: ResetOptions.bayesConfirmationTheory,
     child: Row(
       children: [
         Image.asset(
@@ -958,12 +1058,12 @@ List<DropdownMenuItem<String>> ddMenuItemList = [
           height: 30,
         ),
         SizedBox(width: 8),
-        SelText('Bayes Confirm.'),
+        SelText(ResetOptions.bayesConfirmationTheory.name),
       ],
     ),
   ),
   DropdownMenuItem(
-    value: 'Raven',
+    value: ResetOptions.raven,
     child: Row(
       children: [
         Image.asset(
@@ -972,12 +1072,12 @@ List<DropdownMenuItem<String>> ddMenuItemList = [
           height: 30,
         ),
         SizedBox(width: 8),
-        SelText('Raven'),
+        SelText(ResetOptions.raven.name),
       ],
     ),
   ),
   DropdownMenuItem(
-    value: 'Miracle',
+    value: ResetOptions.lotteryAndMiracles,
     child: Row(
       children: [
         Image.asset(
@@ -986,7 +1086,7 @@ List<DropdownMenuItem<String>> ddMenuItemList = [
           height: 30,
         ),
         SizedBox(width: 8),
-        SelText('Miracle'),
+        SelText(ResetOptions.lotteryAndMiracles.name),
       ],
     ),
   ),
@@ -1007,9 +1107,7 @@ abstract interface class ILogic {
   set isLoading(bool value);
 }
 
-String selectedResetOption = 'Reset';
-
-Widget wrapToButtons(ILogic aLogic, (int, int) prSum,
+Widget wrapToButtons(ILogic aLogic, (int, int) prSum, BuildContext context,
     {bool isLoading = false}) {
   return Wrap(
     spacing: 10.0,
@@ -1040,10 +1138,18 @@ Widget wrapToButtons(ILogic aLogic, (int, int) prSum,
       SizedBox(width: 8), // Space between buttons
       ElevatedButton(
         onPressed: () {
-          aLogic.showText();
+          showHelpDialog(context);
         },
-        child: SelText('Text'),
+        child: SelText('Help'),
       ),
+      SizedBox(width: 8), // Space between buttons
+
+      // ElevatedButton(
+      //   onPressed: () {
+      //     aLogic.showText();
+      //   },
+      //   child: SelText('Text'),
+      // ),
       DropdownButtonHideUnderline(
         child: Container(
           padding: EdgeInsets.fromLTRB(12, 3, 12, 5),
@@ -1058,12 +1164,12 @@ Widget wrapToButtons(ILogic aLogic, (int, int) prSum,
                 255, 215, 234, 238), // Same as ElevatedButton default
             borderRadius: BorderRadius.circular(10),
           ),
-          child: DropdownButton<String>(
+          child: DropdownButton<ResetOptions>(
             value: selectedResetOption,
             isDense: true,
             icon: const Icon(Icons.arrow_drop_down, size: 25), // Reset icon
-            hint: SelText(selectedResetOption),
-            onChanged: (String? newValue) async {
+            hint: SelText(selectedResetOption.name),
+            onChanged: (ResetOptions? newValue) async {
               if (newValue == null) return;
               selectedResetOption = newValue;
 
@@ -1073,19 +1179,19 @@ Widget wrapToButtons(ILogic aLogic, (int, int) prSum,
               aLogic.isLoading = true;
               try {
                 switch (newValue) {
-                  case 'Reset':
+                  case ResetOptions.reset:
                     await aLogic.reset();
                     break;
-                  case 'Independence of Prob.':
+                  case ResetOptions.independenceOfProbability:
                     await aLogic.resetIP();
                     break;
-                  case 'Bayes Confirm.':
+                  case ResetOptions.bayesConfirmationTheory:
                     await aLogic.resetBCT();
                     break;
-                  case 'Raven':
+                  case ResetOptions.raven:
                     await aLogic.resetRaven();
                     break;
-                  case 'Miracle':
+                  case ResetOptions.lotteryAndMiracles:
                     await aLogic.resetMiracle();
                     break;
                 }
@@ -1106,5 +1212,42 @@ Widget wrapToButtons(ILogic aLogic, (int, int) prSum,
           child: Center(child: const SelText('Error: prSum != 1')),
         ),
     ],
+  );
+}
+
+void showHelpDialog(BuildContext context) {
+  /// show a help dialog with the help text given by variables
+  /// helpTextLFI1, helpTextLETplusK, helpTextCi, helpText4V
+  ///
+  var text = currentLogic == LogicType.lfi1
+      ? helpTextLFI1
+      : currentLogic == LogicType.letplusK
+          ? helpTextLETplusK
+          : currentLogic == LogicType.ci
+              ? helpTextCi
+              : currentLogic == LogicType.fourV
+                  ? helpText4V
+                  : 'No help available for Classical Logic';
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const SelText('Help'),
+        content: SingleChildScrollView(
+          child: SelText(
+            text,
+            style: const TextStyle(fontSize: 16),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const SelText('Close'),
+          ),
+        ],
+      );
+    },
   );
 }

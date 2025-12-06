@@ -569,7 +569,7 @@ class _EveryScreenState extends State<EveryScreen> implements ILogic {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          wrapToButtons(this, _prSum, isLoading: _isLoading),
+          wrapToButtons(this, _prSum, isLoading: _isLoading, context),
           const SizedBox(height: 15),
           Expanded(
               child: table(
@@ -781,7 +781,7 @@ class _EveryScreenState extends State<EveryScreen> implements ILogic {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            selectedResetOption = 'Reset';
+            selectedResetOption = ResetOptions.reset;
             Navigator.of(context).pop();
           },
         ),

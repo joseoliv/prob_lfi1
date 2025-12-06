@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_math_fork/flutter_math.dart';
 import 'package:prob_lfi1/ci_screen.dart';
 import 'package:prob_lfi1/classical_screen.dart';
+import 'package:prob_lfi1/common_lib.dart';
 import 'package:prob_lfi1/every_screen.dart';
 import 'package:prob_lfi1/letk_plus_screen.dart';
 import 'package:prob_lfi1/lfi1_screen.dart';
@@ -43,6 +44,7 @@ class MainMenuScreen extends StatelessWidget {
           children: <Widget>[
             ElevatedButton(
               onPressed: () {
+                currentLogic = LogicType.classical;
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -54,6 +56,7 @@ class MainMenuScreen extends StatelessWidget {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
+                currentLogic = LogicType.lfi1;
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const LFI1Screen()),
@@ -64,6 +67,7 @@ class MainMenuScreen extends StatelessWidget {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
+                currentLogic = LogicType.letplusK;
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -75,6 +79,7 @@ class MainMenuScreen extends StatelessWidget {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
+                currentLogic = LogicType.ci;
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const CiScreen()),
@@ -85,6 +90,7 @@ class MainMenuScreen extends StatelessWidget {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
+                currentLogic = LogicType.fourV;
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const EveryScreen()),
