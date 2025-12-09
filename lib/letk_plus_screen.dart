@@ -279,7 +279,7 @@ class _LetkPlusScreenState extends State<LetkPlusScreen> implements ILogic {
           var t = p + truthValuesA[k];
           // remove the , followed by a space at the end
           t = t.substring(0, t.length - 2);
-          var reducedPr = t.replaceAll(' ', '').replaceAll(',', '');
+          var reducedPr = t.replaceAll(' ', ''); //.replaceAll(',', '');
           _probLabels.add('Pr($reducedPr)');
 
           /// add the values of t to _truthVariableTable

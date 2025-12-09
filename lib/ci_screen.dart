@@ -5,6 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:prob_lfi1/common_lib.dart';
 import 'package:prob_lfi1/fraction.dart';
 
+bool hideZeroProbabilities = true;
+
 class CiScreen extends StatefulWidget {
   const CiScreen({super.key});
 
@@ -459,12 +461,51 @@ class _CiScreenState extends State<CiScreen> implements ILogic {
   // --- UI Building ---
 
   Widget _buildLeftPanel() {
+    final numItems = 28;
     return Container(
       color: const Color(0xFFFFF0F5), // Very light rose (LavenderBlush)
       padding: const EdgeInsets.all(12.0),
       child: ListView.builder(
-        itemCount: 27,
+        itemCount: numItems,
         itemBuilder: (context, index) {
+          if (index == numItems - 1) {
+            if (hideZeroProbabilities) {
+              return Column(
+                /// center the button in the horizontal axis
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 30),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        hideZeroProbabilities = false;
+                      });
+                    },
+                    child: const SelText('Show All Probabilities'),
+                  ),
+                ],
+              );
+            } else {
+              return Column(
+                /// center the button in the horizontal axis
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 30),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        hideZeroProbabilities = true;
+                      });
+                    },
+                    child: const SelText('Show Only Zero Probabilities'),
+                  ),
+                ],
+              );
+            }
+          }
+          if (hideZeroProbabilities && _probValues[index].$1 == 0) {
+            return const SizedBox.shrink();
+          }
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 4.0),
             child: Row(

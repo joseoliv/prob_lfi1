@@ -9,6 +9,8 @@ import 'package:prob_lfi1/fraction.dart';
 final numLinesTruthTable = 64;
 final numCombTruthValues = 4; //  0 0, 0 1, 1 0, 1 1
 
+bool hideZeroProbabilities = true;
+
 class EveryScreen extends StatefulWidget {
   const EveryScreen({super.key});
 
@@ -60,9 +62,9 @@ class _EveryScreenState extends State<EveryScreen> implements ILogic {
   (int, int) _prCNotAB = (0, 1);
   (int, int) _prCNotBA = (0, 1);
   (int, int) _prNotAandB = (0, 1);
-  final (int, int) _prANotBNotC = (0, 1);
-  final (int, int) _prNotBNotC = (0, 1);
-  final (int, int) _prABNotC = (0, 1);
+  (int, int) _prANotBNotC = (0, 1);
+  (int, int) _prNotBNotC = (0, 1);
+  (int, int) _prABNotC = (0, 1);
 
   String _prANumeratorSum = '';
   String _prBNumeratorSum = '';
@@ -335,6 +337,9 @@ class _EveryScreenState extends State<EveryScreen> implements ILogic {
     _prCNotAB = (0, 1);
     _prCNotBA = (0, 1);
     _prNotAandB = (0, 1);
+    _prANotBNotC = (0, 1);
+    _prNotBNotC = (0, 1);
+    _prABNotC = (0, 1);
 
     for (int flatIndex = 0; flatIndex < numLinesTruthTable; flatIndex++) {
       (int, int) currentProb = _probValues[flatIndex];
@@ -483,6 +488,18 @@ class _EveryScreenState extends State<EveryScreen> implements ILogic {
       if (bIsTrue && cIsFalse) {
         _prBNotC = addFractions(_prBNotC, currentProb);
       }
+      if (aIsTrue && bIsFalse && cIsFalse) {
+        // A 1, B 0, C 0
+        _prANotBNotC = addFractions(_prANotBNotC, currentProb);
+      }
+      if (bIsFalse && cIsFalse) {
+        // B 0, C 0
+        _prNotBNotC = addFractions(_prNotBNotC, currentProb);
+      }
+      if (aIsTrue && bIsTrue && cIsFalse) {
+        // A 1, B 1, C 0
+        _prABNotC = addFractions(_prABNotC, currentProb);
+      }
     }
     // Update state to re-render the UI
     setState(() {});
@@ -494,19 +511,55 @@ class _EveryScreenState extends State<EveryScreen> implements ILogic {
     return Container(
       color: creamTea,
       padding: const EdgeInsets.all(12.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Column(
         children: [
+          if (hideZeroProbabilities)
+            Column(
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      hideZeroProbabilities = false;
+                    });
+                  },
+                  child: const SelText('Show All Probabilities'),
+                ),
+                SizedBox(height: 30),
+              ],
+            ),
+          if (!hideZeroProbabilities)
+            Column(
+              /// center the button in the horizontal axis
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      hideZeroProbabilities = true;
+                    });
+                  },
+                  child: const SelText('Show Only Zero Probabilities'),
+                ),
+                SizedBox(height: 30),
+              ],
+            ),
           Expanded(
-            child: valuationProbList(22, 0),
-          ),
-          const SizedBox(width: 2),
-          Expanded(
-            child: valuationProbList(22, 22),
-          ),
-          const SizedBox(width: 2),
-          Expanded(
-            child: valuationProbList(20, 44),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: valuationProbList(22, 0),
+                ),
+                const SizedBox(width: 2),
+                Expanded(
+                  child: valuationProbList(22, 22),
+                ),
+                const SizedBox(width: 2),
+                Expanded(
+                  child: valuationProbList(20, 44),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -518,6 +571,9 @@ class _EveryScreenState extends State<EveryScreen> implements ILogic {
       itemCount: size,
       itemBuilder: (context, index) {
         final actualIndex = index + startIndex;
+        if (hideZeroProbabilities && _probValues[actualIndex].$1 == 0) {
+          return const SizedBox.shrink(); // Return an empty widget
+        }
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 3.0),
           child: Row(
@@ -569,7 +625,7 @@ class _EveryScreenState extends State<EveryScreen> implements ILogic {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          wrapToButtons(this, _prSum, isLoading: _isLoading, context),
+          wrapToButtons(this, _prSum, context, isLoading: _isLoading),
           const SizedBox(height: 15),
           Expanded(
               child: table(

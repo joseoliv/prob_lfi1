@@ -22,6 +22,24 @@ enum LogicType { classical, lfi1, letplusK, ci, fourV }
 
 LogicType currentLogic = LogicType.classical;
 
+bool isTruthFunctional(LogicType logic) {
+  switch (logic) {
+    case LogicType.classical:
+      return true;
+    case LogicType.lfi1:
+      return true;
+    case LogicType.letplusK:
+      return true;
+    case LogicType.ci:
+      return false;
+    case LogicType.fourV:
+      return false;
+    // ignore: unreachable_switch_default
+    default:
+      throw "Current logic not recognized";
+  }
+}
+
 var helpTextLFI1 = '''
 A row in the left-hand side of this screen with 
     Pr(a, b, c) 
@@ -35,14 +53,14 @@ Note that, with 3 truth values, 0, 1/2, and 1, there are 27 possible valuations.
 
 var helpTextLETplusK = '''
 A row in the left-hand side of this screen with 
-    Pr(abc) 
+    Pr(a,b,c) 
 means a valuation v in which 
     v(A) = a 
     v(B) = b 
     v(C) = c
 The rectangle to the right of Pr(a, b, c) is the probability of that valuation.
 Note that, with 6 truth values, there are 216 possible valuations.
-The truth values are t, t0, b, n, f0, f
+The truth values are t, t0, b, n, f0, f.
 ''';
 
 var helpTextCi = '''
@@ -55,32 +73,51 @@ means a valuation v in which
     v(~B) = ê
     v(C) = u
     v(~C) = û
-The rectangle to the right of Pr(a,â,e,ê,u,û) is the 
-probability of that valuation. Note that, with 
-2 truth values and three variables such that the 
-value of A and the value of ~A are independent, 
-there should be 2^6 = 64 possible valuations.
-But there are 27 because, whenever v(A) = 0, 
-then v(~A) = 1. But if v(A) = 1, v(~A) can be 
-either 0 or 1. 
-''';
+The rectangle located to the right of Pr(a,â,e,ê,u,û) 
+represents the probability of that valuation. 
+Note that, with 2 truth values and three variables 
+such that the value of A and the value of ~A are
+independent, there should be 2^6 = 64 possible
+valuations. But there are 27 because, whenever 
+v(A) = 0, then v(~A) = 1. But if v(A) = 1, v(~A) 
+can be either 0 or 1. 
+
+The Stochastic Truth Table shown on the left is 
+misleading. When it says that, for example, 
+  P(0,1,1,1,0,1) = 1/9
+it means that there is ONE valuation v
+such that v(A) = 0, v(~A) = 1, v(B) = 1, etc. 
+and Pr(v) = 1/9. There are infinitely many such 
+valuations because 4V is not truth-functional.
+The infinity number of all other valuations 
+not shown in the left table have probability 0.''';
 
 var helpText4V = '''
-A row in the left-hand side of this screen with 
-    Pr(aâeêuû) 
+A row on the left-hand side of this screen with 
+  Pr(aâeêuû) 
 means a valuation v in which 
-    v(A) = a 
-    v(~A) = â 
-    v(B) = e
-    v(~B) = ê
-    v(C) = u
-    v(~C) = û
-The rectangle to the right of Pr(aâeêuû) is the 
-probability of that valuation. Note that, with 
-2 truth values and three variables such that the 
-value of A and the value of ~A are independent, 
-there are 2^6 = 64 possible valuations.
-''';
+  v(A) = a 
+  v(~A) = â 
+  v(B) = e
+  v(~B) = ê
+  v(C) = u
+  v(~C) = û
+
+The rectangle located to the right of Pr(a,â,e,ê,u,û) 
+represents the probability of that valuation. 
+Note that, with 2 truth values and three variables 
+such that the value of A and the value of ~A are 
+independent, there are 2^6 = 64 possible valuations.
+
+The Stochastic Truth Table shown on the left is 
+misleading. When it says that, for example, 
+  P(011101) = 1/9
+it means that there is ONE valuation v
+such that v(A) = 0, v(~A) = 1, v(B) = 1, etc. 
+and Pr(v) = 1/9. There are infinitely many such 
+valuations because 4V is not truth-functional.
+The infinity number of all other valuations 
+not shown in the left table have probability 0''';
 
 // 'Reset', 'Independence of Prob.', 'Bayes Confirm.', 'Raven', 'Miracle'
 enum ResetOptions {
