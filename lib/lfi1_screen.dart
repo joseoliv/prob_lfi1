@@ -420,7 +420,7 @@ class _LFI1ScreenState extends State<LFI1Screen> implements ILogic {
   Widget _buildLeftPanel() {
     final numItems = 28;
     return Container(
-      color: const Color(0xFFFFF0F5), // Very light rose (LavenderBlush)
+      color: leftPanelColor, // Very light rose (LavenderBlush)
       padding: const EdgeInsets.all(12.0),
       child: ListView.builder(
         itemCount: numItems,
@@ -500,7 +500,7 @@ class _LFI1ScreenState extends State<LFI1Screen> implements ILogic {
 
   Widget _buildRightPanel() {
     return Container(
-      color: const Color(0xFFF0FFF0), // Very light tea (Honeydew)
+      color: rightPanelColor, // Very light tea (Honeydew)
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -710,7 +710,7 @@ class _LFI1ScreenState extends State<LFI1Screen> implements ILogic {
     return Scaffold(
       appBar: AppBar(
         title: const SelText('Probability Calculator for LFI1'),
-        backgroundColor: Colors.blueGrey[100],
+        backgroundColor: scaffoldBackground,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {

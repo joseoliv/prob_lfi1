@@ -631,7 +631,7 @@ class _ClassicalScreenState extends State<ClassicalScreen> implements ILogic {
 
   Widget _buildLeftPanel() {
     return Container(
-      color: creamTea,
+      color: leftPanelColor,
       padding: const EdgeInsets.all(12.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -700,7 +700,7 @@ class _ClassicalScreenState extends State<ClassicalScreen> implements ILogic {
 
   Widget _buildRightPanel() {
     return Container(
-      color: paleOolong,
+      color: rightPanelColor,
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -886,7 +886,7 @@ class _ClassicalScreenState extends State<ClassicalScreen> implements ILogic {
           },
         ),
         title: const SelText('Probability Calculator for a classical logic'),
-        backgroundColor: const Color.fromARGB(255, 246, 221, 221),
+        backgroundColor: scaffoldBackground,
       ),
       body: Row(
         children: [

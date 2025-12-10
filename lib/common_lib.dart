@@ -18,6 +18,14 @@ const Color barelyTea = Color(0xFFFAFAF5);
 const Color teaMist = Color(0xFFF9F7F4);
 const Color paleChai = Color(0xFFF4F0E8);
 
+const leftPanelColor = Color(0xFFFFF0F5);
+const rightPanelColor = Color.fromARGB(255, 244, 252, 244);
+var gtOneColor = Color.fromARGB(255, 231, 255, 190);
+var problemColor = Colors.lightGreenAccent;
+var tableBorderColor = const Color.fromARGB(255, 9, 156, 161);
+var scaffoldBackground = const Color.fromARGB(
+    255, 219, 254, 255); //  Color.fromARGB(255, 221, 239, 251);
+
 enum LogicType { classical, lfi1, letplusK, ci, fourV }
 
 LogicType currentLogic = LogicType.classical;
@@ -103,7 +111,7 @@ means a valuation v in which
   v(C) = u
   v(~C) = û
 
-The rectangle located to the right of Pr(a,â,e,ê,u,û) 
+The rectangle located to the right of Pr(aâeêuû) 
 represents the probability of that valuation. 
 Note that, with 2 truth values and three variables 
 such that the value of A and the value of ~A are 
@@ -340,7 +348,7 @@ Widget table(
               padding: const EdgeInsets.only(
                   right: 16.0), // Space between table and scrollbar
               child: Table(
-                border: TableBorder.all(color: Colors.blue),
+                border: TableBorder.all(color: tableBorderColor),
                 columnWidths: const {
                   0: FlexColumnWidth(1.5), // First column wider
                   1: FlexColumnWidth(1.5), // Second column wider
@@ -387,18 +395,14 @@ Widget table(
                     TableCell(
                       child: Container(
                           padding: inSetCell,
-                          color: gt(prAPlusNotA, (1, 1))
-                              ? Colors.orangeAccent
-                              : null,
+                          color: gt(prAPlusNotA, (1, 1)) ? gtOneColor : null,
                           child:
                               _buildResultRow('Pr(~A)+Pr(A) = ', prAPlusNotA)),
                     ),
                     TableCell(
                       child: Container(
                           padding: inSetCell,
-                          color: gt(prBPlusNotB, (1, 1))
-                              ? Colors.orangeAccent
-                              : null,
+                          color: gt(prBPlusNotB, (1, 1)) ? gtOneColor : null,
                           child:
                               _buildResultRow('Pr(~B)+Pr(B) = ', prBPlusNotB)),
                     )
@@ -407,9 +411,7 @@ Widget table(
                     TableCell(
                       child: Container(
                           padding: inSetCell,
-                          color: gt(prCPlusNotC, (1, 1))
-                              ? Colors.orangeAccent
-                              : null,
+                          color: gt(prCPlusNotC, (1, 1)) ? gtOneColor : null,
                           child:
                               _buildResultRow('Pr(C)+Pr(~C) = ', prCPlusNotC)),
                     ),
@@ -423,7 +425,7 @@ Widget table(
                       TableCell(
                           child: Container(
                               padding: inSetCell,
-                              color: Colors.lightBlueAccent,
+                              color: problemColor,
                               child: SelText(
                                 'Independence of Probability (boolean expressions must be true) ',
                                 style: textStyle,
@@ -431,7 +433,7 @@ Widget table(
                       TableCell(
                         child: Container(
                             padding: inSetCell,
-                            color: Colors.lightBlueAccent,
+                            color: problemColor,
                             child: Text('')),
                       ),
                     ]),
@@ -511,14 +513,14 @@ Widget table(
                       TableCell(
                           child: Container(
                               padding: inSetCell,
-                              color: Colors.lightBlueAccent,
+                              color: problemColor,
                               child: SelText(
                                   'Bayesian Confirmation Theory (boolean expressions must be true)  ',
                                   style: textStyle))),
                       TableCell(
                         child: Container(
                             padding: inSetCell,
-                            color: Colors.lightBlueAccent,
+                            color: problemColor,
                             child: SelText('d(H, E) = Pr(H|E) - Pr(H)',
                                 style: textStyle)),
                       ),
@@ -527,13 +529,13 @@ Widget table(
                       TableCell(
                           child: Container(
                               padding: inSetCell,
-                              color: Colors.lightBlueAccent,
+                              color: problemColor,
                               child: SelText('s(C, A) = Pr(C|A) - Pr(C|~A)',
                                   style: textStyle))),
                       TableCell(
                         child: Container(
                             padding: inSetCell,
-                            color: Colors.lightBlueAccent,
+                            color: problemColor,
                             child: SelText(
                                 'i(C, A) = (Pr(A|C) - Pr(A|~C)) / (Pr(A|C) + Pr(A|~C))',
                                 style: textStyle)),
@@ -670,7 +672,7 @@ Widget table(
                       TableCell(
                           child: Container(
                               padding: inSetCell,
-                              color: Colors.lightBlueAccent,
+                              color: problemColor,
                               child: SelText(
                                 'Raven (boolean expressions must be true)',
                                 style: textStyle,
@@ -678,9 +680,9 @@ Widget table(
                       TableCell(
                           child: Container(
                               padding: inSetCell,
-                              color: Colors.lightBlueAccent,
+                              color: problemColor,
                               child: SelText(
-                                'Article uses H, B, R. We use A, B, C instead',
+                                'The Fitelson article uses H, B, R. We use A, B, C instead',
                                 style: textStyle,
                               ))),
                     ]),
@@ -808,7 +810,7 @@ Widget table(
                       TableCell(
                           child: Container(
                               padding: inSetCell,
-                              color: Colors.lightBlueAccent,
+                              color: problemColor,
                               child: SelText(
                                 'Lottery and Miracles (boolean expressions must be true)',
                                 style: textStyle,
@@ -1150,15 +1152,6 @@ Widget wrapToButtons(ILogic aLogic, (int, int) prSum, BuildContext context,
     spacing: 10.0,
     runSpacing: 10.0,
     children: [
-      if (isLoading)
-        SizedBox(
-          width: 100,
-          height: 100,
-          child: CircularProgressIndicator(
-            strokeWidth: 4.0,
-            color: Colors.blue,
-          ),
-        ),
       ElevatedButton(
         onPressed: aLogic.undoLastChange,
         child: Icon(Icons.undo_outlined, size: 20),
@@ -1198,7 +1191,7 @@ Widget wrapToButtons(ILogic aLogic, (int, int) prSum, BuildContext context,
               width: 1, // Border width
             ),
             color: const Color.fromARGB(
-                255, 215, 234, 238), // Same as ElevatedButton default
+                255, 197, 255, 199), // Same as ElevatedButton default
             borderRadius: BorderRadius.circular(10),
           ),
           child: DropdownButton<ResetOptions>(

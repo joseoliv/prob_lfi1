@@ -463,7 +463,7 @@ class _CiScreenState extends State<CiScreen> implements ILogic {
   Widget _buildLeftPanel() {
     final numItems = 28;
     return Container(
-      color: const Color(0xFFFFF0F5), // Very light rose (LavenderBlush)
+      color: leftPanelColor, // Very light rose (LavenderBlush)
       padding: const EdgeInsets.all(12.0),
       child: ListView.builder(
         itemCount: numItems,
@@ -542,8 +542,7 @@ class _CiScreenState extends State<CiScreen> implements ILogic {
 
   Widget _buildRightPanel() {
     return Container(
-      color:
-          const Color.fromARGB(255, 248, 221, 255), // Very light tea (Honeydew)
+      color: rightPanelColor, // Very light tea (Honeydew)
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -789,7 +788,7 @@ class _CiScreenState extends State<CiScreen> implements ILogic {
     return Scaffold(
       appBar: AppBar(
         title: const SelText('Probability Calculator for Ci'),
-        backgroundColor: Colors.blueGrey[100],
+        backgroundColor: scaffoldBackground,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {

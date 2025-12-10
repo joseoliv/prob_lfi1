@@ -509,7 +509,7 @@ class _EveryScreenState extends State<EveryScreen> implements ILogic {
 
   Widget _buildLeftPanel() {
     return Container(
-      color: creamTea,
+      color: leftPanelColor,
       padding: const EdgeInsets.all(12.0),
       child: Column(
         children: [
@@ -620,7 +620,7 @@ class _EveryScreenState extends State<EveryScreen> implements ILogic {
 
   Widget _buildRightPanel() {
     return Container(
-      color: paleOolong,
+      color: rightPanelColor,
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -833,7 +833,7 @@ class _EveryScreenState extends State<EveryScreen> implements ILogic {
       appBar: AppBar(
         title: const SelText(
             'Probability Calculator for 4V (a logic with 4 truth values, like Belnap-Dunn)'),
-        backgroundColor: Colors.blueGrey[100],
+        backgroundColor: scaffoldBackground,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {

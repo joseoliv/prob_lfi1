@@ -69,6 +69,7 @@ enum LetKTV {
 /// for variables A, B, and C, there are 6*6*6 = 216 possibilities
 final numLinesTruthTable = 216;
 final numCombTruthValues = 6;
+bool hideZeroProbabilities = true;
 
 class LetkPlusScreen extends StatefulWidget {
   const LetkPlusScreen({super.key});
@@ -599,24 +600,60 @@ class _LetkPlusScreenState extends State<LetkPlusScreen> implements ILogic {
 
   Widget _buildLeftPanel() {
     return Container(
-      color: creamTea,
+      color: leftPanelColor,
       padding: const EdgeInsets.all(12.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Column(
         children: [
-          SizedBox(
-            width: 300,
-            child: valuationProbList(72, 0),
-          ),
-          const SizedBox(width: 2),
-          SizedBox(
-            width: 300,
-            child: valuationProbList(72, 72),
-          ),
-          const SizedBox(width: 2),
-          SizedBox(
-            width: 300,
-            child: valuationProbList(72, 144),
+          if (hideZeroProbabilities)
+            Column(
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      hideZeroProbabilities = false;
+                    });
+                  },
+                  child: const SelText('Show All Probabilities'),
+                ),
+                SizedBox(height: 30),
+              ],
+            ),
+          if (!hideZeroProbabilities)
+            Column(
+              /// center the button in the horizontal axis
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      hideZeroProbabilities = true;
+                    });
+                  },
+                  child: const SelText('Show Only Zero Probabilities'),
+                ),
+                SizedBox(height: 30),
+              ],
+            ),
+          Expanded(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  width: 300,
+                  child: valuationProbList(72, 0),
+                ),
+                const SizedBox(width: 2),
+                SizedBox(
+                  width: 300,
+                  child: valuationProbList(72, 72),
+                ),
+                const SizedBox(width: 2),
+                SizedBox(
+                  width: 300,
+                  child: valuationProbList(72, 144),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -628,6 +665,10 @@ class _LetkPlusScreenState extends State<LetkPlusScreen> implements ILogic {
       itemCount: size,
       itemBuilder: (context, index) {
         final actualIndex = index + startIndex;
+        if (hideZeroProbabilities && _probValues[actualIndex].$1 == 0) {
+          return const SizedBox.shrink(); // Return an empty widget
+        }
+
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 3.0),
           child: Row(
@@ -674,7 +715,7 @@ class _LetkPlusScreenState extends State<LetkPlusScreen> implements ILogic {
 
   Widget _buildRightPanel() {
     return Container(
-      color: paleOolong,
+      color: rightPanelColor,
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -872,9 +913,9 @@ class _LetkPlusScreenState extends State<LetkPlusScreen> implements ILogic {
       appBar: AppBar(
         title: Row(children: [
           SelText('Probability Calculator for '),
-          Math.tex('LET^+_K')
+          Math.tex('LET^+_K'),
         ]),
-        backgroundColor: const Color.fromARGB(255, 225, 244, 252),
+        backgroundColor: scaffoldBackground,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
