@@ -26,7 +26,6 @@ var tableBorderColor = const Color.fromARGB(255, 9, 156, 161);
 var scaffoldBackground = const Color.fromARGB(
     255, 219, 254, 255); //  Color.fromARGB(255, 221, 239, 251);
 
-
 bool showMessageChooseOptionInGreenMenu = true;
 
 enum LogicType { classical, lfi1, letplusK, ci, fourV }
@@ -1150,7 +1149,7 @@ abstract interface class ILogic {
 }
 
 Widget wrapToButtons(ILogic aLogic, (int, int) prSum, BuildContext context,
-    {bool isLoading = false}) {
+    {bool isLoading = false, Animation<double>? scaleAnimation}) {
   return Wrap(
     spacing: 10.0,
     runSpacing: 10.0,
@@ -1177,57 +1176,60 @@ Widget wrapToButtons(ILogic aLogic, (int, int) prSum, BuildContext context,
       ),
       SizedBox(width: 8), // Space between buttons
 
-      DropdownButtonHideUnderline(
-        child: Container(
-          padding: EdgeInsets.fromLTRB(12, 3, 12, 5),
+      ScaleTransition(
+        scale: scaleAnimation ?? AlwaysStoppedAnimation(1.0),
+        child: DropdownButtonHideUnderline(
+          child: Container(
+            padding: EdgeInsets.fromLTRB(12, 3, 12, 5),
 
-          /// a rounded border to the DropdownButton
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: const Color.fromARGB(255, 96, 139, 109), // Border color
-              width: 1, // Border width
+            /// a rounded border to the DropdownButton
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: const Color.fromARGB(255, 96, 139, 109), // Border color
+                width: 1, // Border width
+              ),
+              color: const Color.fromARGB(
+                  255, 197, 255, 199), // Same as ElevatedButton default
+              borderRadius: BorderRadius.circular(10),
             ),
-            color: const Color.fromARGB(
-                255, 197, 255, 199), // Same as ElevatedButton default
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: DropdownButton<ResetOptions>(
-            value: selectedResetOption,
-            isDense: true,
-            icon: const Icon(Icons.arrow_drop_down, size: 25), // Reset icon
-            hint: SelText(selectedResetOption.name),
-            onChanged: (ResetOptions? newValue) async {
-              if (newValue == null) return;
-              selectedResetOption = newValue;
+            child: DropdownButton<ResetOptions>(
+              value: selectedResetOption,
+              isDense: true,
+              icon: const Icon(Icons.arrow_drop_down, size: 25), // Reset icon
+              hint: SelText(selectedResetOption.name),
+              onChanged: (ResetOptions? newValue) async {
+                if (newValue == null) return;
+                selectedResetOption = newValue;
 
-              aLogic.setState(() {});
-
-              // Set loading state and execute async operations
-              aLogic.isLoading = true;
-              try {
-                switch (newValue) {
-                  case ResetOptions.reset:
-                    await aLogic.reset();
-                    break;
-                  case ResetOptions.independenceOfProbability:
-                    await aLogic.resetIP();
-                    break;
-                  case ResetOptions.bayesConfirmationTheory:
-                    await aLogic.resetBCT();
-                    break;
-                  case ResetOptions.raven:
-                    await aLogic.resetRaven();
-                    break;
-                  case ResetOptions.lotteryAndMiracles:
-                    await aLogic.resetMiracle();
-                    break;
-                }
-              } finally {
-                aLogic.isLoading = false;
                 aLogic.setState(() {});
-              }
-            },
-            items: ddMenuItemList,
+
+                // Set loading state and execute async operations
+                aLogic.isLoading = true;
+                try {
+                  switch (newValue) {
+                    case ResetOptions.reset:
+                      await aLogic.reset();
+                      break;
+                    case ResetOptions.independenceOfProbability:
+                      await aLogic.resetIP();
+                      break;
+                    case ResetOptions.bayesConfirmationTheory:
+                      await aLogic.resetBCT();
+                      break;
+                    case ResetOptions.raven:
+                      await aLogic.resetRaven();
+                      break;
+                    case ResetOptions.lotteryAndMiracles:
+                      await aLogic.resetMiracle();
+                      break;
+                  }
+                } finally {
+                  aLogic.isLoading = false;
+                  aLogic.setState(() {});
+                }
+              },
+              items: ddMenuItemList,
+            ),
           ),
         ),
       ),

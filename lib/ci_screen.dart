@@ -14,9 +14,13 @@ class CiScreen extends StatefulWidget {
   State<CiScreen> createState() => _CiScreenState();
 }
 
-class _CiScreenState extends State<CiScreen> implements ILogic {
+class _CiScreenState extends State<CiScreen>
+    with SingleTickerProviderStateMixin
+    implements ILogic {
   // --- State Variables ---
   bool _isLoading = false;
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
 
   // (b) probValues and related
   late List<TextEditingController> _textControllers;
@@ -76,6 +80,17 @@ class _CiScreenState extends State<CiScreen> implements ILogic {
   void initState() {
     super.initState();
     initializeProbabilities();
+    // Configure the controller for a total duration of 0.5 seconds
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 3000),
+      vsync: this,
+    );
+
+    // Define a scaling animation: goes from normal (1.0) up to 1.3x size, then back to 1.0
+    _scaleAnimation = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween<double>(begin: 1.0, end: 2), weight: 50.0),
+      TweenSequenceItem(tween: Tween<double>(begin: 2, end: 1.0), weight: 50.0),
+    ]).animate(_controller);
   }
 
   // --- Undo/Redo Logic ---
@@ -154,7 +169,7 @@ class _CiScreenState extends State<CiScreen> implements ILogic {
             i++) {
           _probValues[i] = initialValues[i];
         }
-      } 
+      }
       // else {
       //   _probValues[0] = (1459, 2000);
       //   _probValues[2] = (161, 2000);
@@ -212,7 +227,14 @@ class _CiScreenState extends State<CiScreen> implements ILogic {
     for (var controller in _textControllers) {
       controller.dispose();
     }
+    _controller.dispose();
     super.dispose();
+  }
+
+  // Method to start the animation once
+  void startHighlightAnimation() {
+    // Reset any previous state and start the animation forward
+    _controller.forward(from: 0.0);
   }
 
   // --- Helper Functions ---
@@ -550,7 +572,12 @@ class _CiScreenState extends State<CiScreen> implements ILogic {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          wrapToButtons(this, _prSum, isLoading: _isLoading, context),
+          wrapToButtons(
+              this,
+              _prSum,
+              isLoading: _isLoading,
+              context,
+              scaleAnimation: _scaleAnimation),
           const SizedBox(height: 15),
           Expanded(
               child: table(
