@@ -130,7 +130,7 @@ The infinity number of all other valuations
 not shown in the left table have probability 0''';
 
 // 'Reset', 'Independence of Prob.', 'Bayes Confirm.', 'Raven', 'Miracle'
-enum ResetOptions {
+enum ResultKind {
   reset,
   independenceOfProbability,
   bayesConfirmationTheory,
@@ -139,21 +139,21 @@ enum ResetOptions {
 
   String get name {
     switch (this) {
-      case ResetOptions.reset:
+      case ResultKind.reset:
         return 'Reset';
-      case ResetOptions.independenceOfProbability:
+      case ResultKind.independenceOfProbability:
         return 'Independence of Probability';
-      case ResetOptions.bayesConfirmationTheory:
+      case ResultKind.bayesConfirmationTheory:
         return 'Bayes Confirmation Theory';
-      case ResetOptions.raven:
+      case ResultKind.raven:
         return 'Raven';
-      case ResetOptions.lotteryAndMiracles:
+      case ResultKind.lotteryAndMiracles:
         return 'Lotteries and Miracles';
     }
   }
 }
 
-ResetOptions selectedResetOption = ResetOptions.reset;
+ResultKind selectedResult = ResultKind.reset;
 
 Widget _buildResultRow(String label, (int, int) value) {
   return Padding(
@@ -421,8 +421,8 @@ Widget table(
                       child: Padding(padding: inSetCell, child: Text('')),
                     )
                   ]),
-                  if (selectedResetOption ==
-                      ResetOptions.independenceOfProbability) ...[
+                  if (selectedResult ==
+                      ResultKind.independenceOfProbability) ...[
                     TableRow(children: [
                       TableCell(
                           child: Container(
@@ -509,8 +509,7 @@ Widget table(
                                   !eq(prABC, prAprBprC) ? 'True' : 'False'))),
                     ]),
                   ],
-                  if (selectedResetOption ==
-                      ResetOptions.bayesConfirmationTheory) ...[
+                  if (selectedResult == ResultKind.bayesConfirmationTheory) ...[
                     TableRow(children: [
                       TableCell(
                           child: Container(
@@ -669,7 +668,7 @@ Widget table(
                                   gt(dCA, dCB) ? 'True' : 'False'))),
                     ]),
                   ],
-                  if (selectedResetOption == ResetOptions.raven) ...[
+                  if (selectedResult == ResultKind.raven) ...[
                     TableRow(children: [
                       TableCell(
                           child: Container(
@@ -806,8 +805,7 @@ Widget table(
                                       : 'False'))),
                     ]),
                   ],
-                  if (selectedResetOption ==
-                      ResetOptions.lotteryAndMiracles) ...[
+                  if (selectedResult == ResultKind.lotteryAndMiracles) ...[
                     TableRow(children: [
                       TableCell(
                           child: Container(
@@ -1062,19 +1060,19 @@ double _parseFraction(String fraction) {
   }
 }
 
-List<DropdownMenuItem<ResetOptions>> ddMenuItemList = [
+List<DropdownMenuItem<ResultKind>> ddMenuItemList = [
   DropdownMenuItem(
-    value: ResetOptions.reset,
+    value: ResultKind.reset,
     child: Row(
       children: [
         Icon(Icons.restart_alt, size: 20),
         SizedBox(width: 8),
-        SelText(ResetOptions.reset.name),
+        SelText(ResultKind.reset.name),
       ],
     ),
   ),
   DropdownMenuItem(
-    value: ResetOptions.independenceOfProbability,
+    value: ResultKind.independenceOfProbability,
     child: Row(
       children: [
         Transform.rotate(
@@ -1085,12 +1083,12 @@ List<DropdownMenuItem<ResetOptions>> ddMenuItemList = [
           ),
         ),
         const SizedBox(width: 8),
-        SelText(ResetOptions.independenceOfProbability.name),
+        SelText(ResultKind.independenceOfProbability.name),
       ],
     ),
   ),
   DropdownMenuItem(
-    value: ResetOptions.bayesConfirmationTheory,
+    value: ResultKind.bayesConfirmationTheory,
     child: Row(
       children: [
         Image.asset(
@@ -1099,12 +1097,12 @@ List<DropdownMenuItem<ResetOptions>> ddMenuItemList = [
           height: 30,
         ),
         SizedBox(width: 8),
-        SelText(ResetOptions.bayesConfirmationTheory.name),
+        SelText(ResultKind.bayesConfirmationTheory.name),
       ],
     ),
   ),
   DropdownMenuItem(
-    value: ResetOptions.raven,
+    value: ResultKind.raven,
     child: Row(
       children: [
         Image.asset(
@@ -1113,12 +1111,12 @@ List<DropdownMenuItem<ResetOptions>> ddMenuItemList = [
           height: 30,
         ),
         SizedBox(width: 8),
-        SelText(ResetOptions.raven.name),
+        SelText(ResultKind.raven.name),
       ],
     ),
   ),
   DropdownMenuItem(
-    value: ResetOptions.lotteryAndMiracles,
+    value: ResultKind.lotteryAndMiracles,
     child: Row(
       children: [
         Image.asset(
@@ -1127,7 +1125,7 @@ List<DropdownMenuItem<ResetOptions>> ddMenuItemList = [
           height: 30,
         ),
         SizedBox(width: 8),
-        SelText(ResetOptions.lotteryAndMiracles.name),
+        SelText(ResultKind.lotteryAndMiracles.name),
       ],
     ),
   ),
@@ -1176,6 +1174,105 @@ Widget wrapToButtons(ILogic aLogic, (int, int) prSum, BuildContext context,
       ),
       SizedBox(width: 8), // Space between buttons
 
+      StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+          return SegmentedButton<ResultKind>(
+            segments: <ButtonSegment<ResultKind>>[
+              ButtonSegment<ResultKind>(
+                  value: ResultKind.reset, label: Text('Reset')),
+              ButtonSegment<ResultKind>(
+                  value: ResultKind.independenceOfProbability,
+                  label: Center(
+                    child: Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        Transform.rotate(
+                          angle: 0.785398, // 45 degrees in radians (π/4)
+                          child: const Text(
+                            '=',
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        SelText(ResultKind.independenceOfProbability.name),
+                      ],
+                    ),
+                  )),
+              ButtonSegment<ResultKind>(
+                  value: ResultKind.bayesConfirmationTheory,
+                  label: Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      Image.asset(
+                        'assets/icons/visual-bayes-theorem.png',
+                        width: 30,
+                        height: 30,
+                      ),
+                      SizedBox(width: 8),
+                      SelText(ResultKind.bayesConfirmationTheory.name),
+                    ],
+                  )),
+              ButtonSegment<ResultKind>(
+                  value: ResultKind.raven,
+                  label: Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      Image.asset(
+                        'assets/icons/raven-aistudio.png',
+                        width: 30,
+                        height: 30,
+                      ),
+                      SizedBox(width: 8),
+                      SelText(ResultKind.raven.name),
+                    ],
+                  )),
+              ButtonSegment<ResultKind>(
+                  value: ResultKind.lotteryAndMiracles,
+                  label: Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      Image.asset(
+                        'assets/icons/wand-left.png',
+                        width: 30,
+                        height: 30,
+                      ),
+                      SizedBox(width: 8),
+                      SelText(ResultKind.lotteryAndMiracles.name),
+                    ],
+                  )),
+            ],
+            selected: {selectedResult},
+            onSelectionChanged: (Set<ResultKind> newSelection) {
+              /// call setState using context
+
+              setState(() {
+                selectedResult = newSelection.first;
+                //_handleOptionSelected(selectedResult);
+                switch (selectedResult) {
+                  case ResultKind.reset:
+                    aLogic.reset();
+                    break;
+                  case ResultKind.independenceOfProbability:
+                    aLogic.resetIP();
+                    break;
+                  case ResultKind.bayesConfirmationTheory:
+                    aLogic.resetBCT();
+                    break;
+                  case ResultKind.raven:
+                    aLogic.resetRaven();
+                    break;
+                  case ResultKind.lotteryAndMiracles:
+                    aLogic.resetMiracle();
+                    break;
+                }
+              });
+            },
+            multiSelectionEnabled: false,
+          );
+        },
+      ),
+      SizedBox(width: 12), // Space between buttons
       ScaleTransition(
         scale: scaleAnimation ?? AlwaysStoppedAnimation(1.0),
         child: DropdownButtonHideUnderline(
@@ -1192,14 +1289,14 @@ Widget wrapToButtons(ILogic aLogic, (int, int) prSum, BuildContext context,
                   255, 197, 255, 199), // Same as ElevatedButton default
               borderRadius: BorderRadius.circular(10),
             ),
-            child: DropdownButton<ResetOptions>(
-              value: selectedResetOption,
+            child: DropdownButton<ResultKind>(
+              value: selectedResult,
               isDense: true,
               icon: const Icon(Icons.arrow_drop_down, size: 25), // Reset icon
-              hint: SelText(selectedResetOption.name),
-              onChanged: (ResetOptions? newValue) async {
+              hint: SelText(selectedResult.name),
+              onChanged: (ResultKind? newValue) async {
                 if (newValue == null) return;
-                selectedResetOption = newValue;
+                selectedResult = newValue;
 
                 aLogic.setState(() {});
 
@@ -1207,19 +1304,19 @@ Widget wrapToButtons(ILogic aLogic, (int, int) prSum, BuildContext context,
                 aLogic.isLoading = true;
                 try {
                   switch (newValue) {
-                    case ResetOptions.reset:
+                    case ResultKind.reset:
                       await aLogic.reset();
                       break;
-                    case ResetOptions.independenceOfProbability:
+                    case ResultKind.independenceOfProbability:
                       await aLogic.resetIP();
                       break;
-                    case ResetOptions.bayesConfirmationTheory:
+                    case ResultKind.bayesConfirmationTheory:
                       await aLogic.resetBCT();
                       break;
-                    case ResetOptions.raven:
+                    case ResultKind.raven:
                       await aLogic.resetRaven();
                       break;
-                    case ResetOptions.lotteryAndMiracles:
+                    case ResultKind.lotteryAndMiracles:
                       await aLogic.resetMiracle();
                       break;
                   }

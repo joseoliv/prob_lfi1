@@ -717,7 +717,7 @@ class _LFI1ScreenState extends State<LFI1Screen> implements ILogic {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            selectedResetOption = ResetOptions.reset;
+            selectedResult = ResultKind.reset;
             Navigator.of(context).pop();
           },
         ),

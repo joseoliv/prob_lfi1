@@ -837,7 +837,7 @@ class _EveryScreenState extends State<EveryScreen> implements ILogic {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            selectedResetOption = ResetOptions.reset;
+            selectedResult = ResultKind.reset;
             Navigator.of(context).pop();
           },
         ),

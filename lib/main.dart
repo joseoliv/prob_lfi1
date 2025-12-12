@@ -21,6 +21,22 @@ class ProbabilityApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
         useMaterial3: true,
+        // *** 1. Define the global theme for the button here ***
+        segmentedButtonTheme: SegmentedButtonThemeData(
+          style: SegmentedButton.styleFrom(
+            // border color should be dark green
+            side: BorderSide(
+                color: tableBorderColor,
+                width: 1), // Border color of unselected segment
+            // When selected, the color will be blue
+            foregroundColor: Colors.grey[700], // Color of unselected text/icon
+            backgroundColor: Colors.white, // Background of unselected segment
+            selectedForegroundColor:
+                Colors.white, // Color of selected text/icon
+            selectedBackgroundColor: const Color.fromARGB(
+                255, 197, 255, 199), // Background of selected segment
+          ),
+        ),
       ),
       home: const MainMenuScreen(),
       debugShowCheckedModeBanner: false,
